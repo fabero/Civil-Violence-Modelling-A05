@@ -1,5 +1,5 @@
 from mesa import Agent, Model
-
+from mesa.time import RandomActivation
 
 class PopulationAgent(Agent):
     """An agent that can become active."""
@@ -19,6 +19,7 @@ class CopAgent(Agent):
     def step(self):
         # The agent's step will go here.
         pass
+
 
 class CivilViolenceModel(Model):
     """A model with some number of PopulationAgents and some number of CopAgents."""
