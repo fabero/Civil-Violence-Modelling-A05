@@ -62,16 +62,31 @@ class PopulationAgent(Agent):
 
                 actives_in_vision += 1
 
+        # defining arrest probability for each agent
+        # depending on cop is to active population agent ratio
+        # arrest_prob _constant is defined as 2.3 in the netlogo implementation
         self.ratio_c_a =  cops_in_vision/actives_in_vision
         self.arrest_probability = (1 - math.exp(-1 * self.model.arrest_prob_constant)*self.ratio_c_a)
 
+        # calculating net_risk given risk aversion and arrest probability
+        # we further calculate a bool value if difference of grievance and net_risk
+        # is greater than threshold value which is defined as 0.1 in net logo implementation
         self.net_risk = self.risk_aversion * self.arrest_probability
         thresh_bool = (self.grievance - self.net_risk) > threshold
-        
+
+
+        # simple state transition for population agent
+        # Case 1: if state is inactive and thresh bool is true
+        # then transition to an active state, set active flag to true
+        # Case 2: if active flag is true but thresh bool has changes to false
+        # then transition back to inactive state
         if self.active ==  False and thresh_bool:
             self.active = True
         elif self.active == True and not thresh_bool:
             self.active = False
+
+        # movement rule: randomly move to empty neighborhood cells
+        # around your current position
         if self.model.movement and self.empty_cells:
             new_position = self.random.choice(self.empty_cells)
             self.model.gride.move_agent(self, new_position)
