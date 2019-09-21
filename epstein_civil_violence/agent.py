@@ -66,8 +66,8 @@ class Citizen(Agent):
         """
         if self.jail_sentence:
             self.jail_sentence -= 1
-            #if not self.jail_sentence:
-            #    self.condition = 'Quiescent' 
+            if not self.jail_sentence:
+                self.condition = 'Quiescent' 
             return  # no other changes or movements if agent is in jail.
         self.update_neighbors()
         self.update_estimated_arrest_probability()
