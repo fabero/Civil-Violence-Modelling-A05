@@ -1,5 +1,10 @@
 # Introduction
-Implementation of Simulation 1 from Epstein's paper "Modeling civil violence: an agent-based computational approach" https://www.semanticscholar.org/paper/Modeling-civil-violence%3A-an-agent-based-approach.-Epstein/012d71badb72df66a59c306dc597b4c96d783083. Implementation is based on the given examples of the mesa framework https://github.com/projectmesa/mesa/tree/master/examples/epstein_civil_violence but modified so that the simulation demonstrates the system punctuated equilibria that Epstein describes in his paper. The modifications are based on the NetLogo implementation: https://ccl.northwestern.edu/netlogo/models/Rebellion.
+Implementation of Simulation 1 from Epstein's paper "Modeling civil violence: an agent-based computational approach" https://www.semanticscholar.org/paper/Modeling-civil-violence%3A-an-agent-based-approach.-Epstein/012d71badb72df66a59c306dc597b4c96d783083. 
+
+Implementation is based on the given examples of the mesa framework https://github.com/projectmesa/mesa/tree/master/examples/epstein_civil_violence 
+
+but modified so that the simulation demonstrates the system punctuated equilibria that Epstein describes in his paper. The modifications are based on the NetLogo implementation:
+https://ccl.northwestern.edu/netlogo/models/Rebellion.
 
 
 # Packages Required
