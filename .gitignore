@@ -2,3 +2,4 @@
 *.py[cw]
 .idea/
 .workspace.xml
+.ipynb_checkpoints/*
