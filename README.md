@@ -7,7 +7,7 @@
 
 # Differences from mesa original implementation:
 
-- portrayal.py, this is the same and is actually rendundant, as you'll see that is also coded inside server.py and called locally.
+- portrayal.py, this is actually rendundant and it's embedded inside CivilVioleneServer.py and called locally.
 
 - server.py, model parameters given as dynamic reconfigurable settings + the line chart for showing the plots
 
