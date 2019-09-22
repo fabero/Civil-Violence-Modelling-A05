@@ -16,9 +16,9 @@ https://ccl.northwestern.edu/netlogo/models/Rebellion.
 
 # Differences from mesa original implementation:
 
-- ``portrayal.py``, this is actually rendundant and it's embedded inside CivilVioleneServer.py and called locally
+- ``portrayal.py``, this is actually rendundant and it's embedded inside CivilVioleneServer.py and called locally.
 
--``CivilViolenceServer.py``, model parameters given as dynamic reconfigurable settings + the line chart for showing the plots
+- ``CivilViolenceServer.py``, model parameters given as dynamic reconfigurable settings + the line chart for showing the plots.
 
 -``CivilViolenceAgent.py``:
         1) Update arrest probability formula with flooring the ratio,
