@@ -16,7 +16,7 @@ https://ccl.northwestern.edu/netlogo/models/Rebellion.
 
 # Differences from mesa original implementation:
 
-- `portrayal.py``, this is actually rendundant and it's embedded inside CivilVioleneServer.py and called locally.
+- ``portrayal.py``, this is actually rendundant and it's embedded inside CivilVioleneServer.py and called locally.
 
 -``CivilViolenceServer.py``, model parameters given as dynamic reconfigurable settings + the line chart for showing the plots
 
@@ -26,5 +26,5 @@ https://ccl.northwestern.edu/netlogo/models/Rebellion.
         3) update_neighbours should work for radius=self.vision instead of simply 1, and
         4) after a jailed agent comes out of jail, her state is set to quiet instead of her previous state before arrest (active)
         
- - `CivilViolenceModel.py``, the same, only the parameters as of NetLogo's model are given, and also percentages are scaled to [0,100] instead of [0,1]
+ - ``CivilViolenceModel.py``, the same, only the parameters as of NetLogo's model are given, and also percentages are scaled to [0,100] instead of [0,1]
   to be able to reconfigure them from webserver.
