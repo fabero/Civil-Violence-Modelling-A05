@@ -1,6 +1,7 @@
 from mesa import Model
 from mesa.time import RandomActivation
-
+from PopulationAgent import PopulationAgent
+from CopAgent import CopAgent
 
 class CivilViolenceModel(Model):
     """A model with some number of PopulationAgents and some number of CopAgents."""
