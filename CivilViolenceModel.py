@@ -1,10 +1,11 @@
 from mesa import Model
 from mesa.time import RandomActivation
 
-from mesa.space import Grid 
-from mesa.datacollection import DataCollector 
+from mesa.space import Grid
+from mesa.datacollection import DataCollector
 
 from CivilViolenceAgents import PopulationAgent, CopAgent
+
 
 class CivilViolenceModel(Model):
     """
@@ -33,10 +34,20 @@ class CivilViolenceModel(Model):
 
     """
 
-    def __init__(self, height=40, width=40, citizen_density=70, cop_density=4,
-                 citizen_vision=7, cop_vision=7, legitimacy=82,
-                 max_jail_term=30, active_threshold=.1, arrest_prob_constant=2.3,
-                 movement=True, max_iters=1000):
+    def __init__(
+            self,
+            height=40,
+            width=40,
+            citizen_density=70,
+            cop_density=4,
+            citizen_vision=7,
+            cop_vision=7,
+            legitimacy=82,
+            max_jail_term=30,
+            active_threshold=.1,
+            arrest_prob_constant=2.3,
+            movement=True,
+            max_iters=1000):
         super().__init__()
         self.height = height
         self.width = width
@@ -73,27 +84,34 @@ class CivilViolenceModel(Model):
         }
         self.datacollector = DataCollector(model_reporters=model_reporters,
                                            agent_reporters=agent_reporters)
-        
+
         unique_id = 0
         if self.cop_density + self.citizen_density > 1:
-            raise ValueError('Cop density + citizen density must be less than 1')
+            raise ValueError(
+                'Cop density + citizen density must be less than 1')
 
         # initialize agents in the grid with respect to the given densities
         for (contents, x, y) in self.grid.coord_iter():
             if self.random.random() < self.cop_density:
-                cop = CopAgent(unique_id, self, vision=self.cop_vision, pos=(x,y))
+                cop = CopAgent(
+                    unique_id,
+                    self,
+                    vision=self.cop_vision,
+                    pos=(
+                        x,
+                        y))
                 unique_id += 1
                 self.grid[y][x] = cop
                 self.schedule.add(cop)
 
             elif self.random.random() < self.cop_density + self.citizen_density:
-                citizen = PopulationAgent(unique_id, self, 
-                                  hardship = self.random.random(),
-                                  legitimacy = self.legitimacy,
-                                  risk_aversion = self.random.random(),
-                                  threshold = self.active_threshold,
-                                  vision = self.citizen_vision,
-                                  pos = (x,y))
+                citizen = PopulationAgent(unique_id, self,
+                                          hardship=self.random.random(),
+                                          legitimacy=self.legitimacy,
+                                          risk_aversion=self.random.random(),
+                                          threshold=self.active_threshold,
+                                          vision=self.citizen_vision,
+                                          pos=(x, y))
                 unique_id += 1
                 self.grid[y][x] = citizen
                 self.schedule.add(citizen)
@@ -114,7 +132,7 @@ class CivilViolenceModel(Model):
         """
         Helper method to count agents by Quiescent/Active depending on ther active flag.
         """
-        count = 0 
+        count = 0
         for agent in model.schedule.agents:
             if agent.agent_class == 'cop':
                 continue
@@ -136,6 +154,3 @@ class CivilViolenceModel(Model):
             if agent.agent_class == 'population' and agent.jail_time:
                 count += 1
         return count
-
-
-
