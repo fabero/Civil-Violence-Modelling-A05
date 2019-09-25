@@ -1,4 +1,4 @@
-[https://www.overleaf.com/read/sbzqqbrnxssb](Overleaf for final paper)
+[Overleaf with project paper](https://www.overleaf.com/read/sbzqqbrnxssb)
 
 # Introduction
 Implementation of Simulation 1 from Epstein's paper "Modeling civil violence: an agent-based computational approach" https://www.semanticscholar.org/paper/Modeling-civil-violence%3A-an-agent-based-approach.-Epstein/012d71badb72df66a59c306dc597b4c96d783083. 
