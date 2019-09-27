@@ -1,0 +1,3 @@
+POPULATION_AGENT_CLASS = 'population'
+PROPAGANDA_AGENT_CLASS = 'propaganda'
+COP_AGENT_CLASS = 'cop'

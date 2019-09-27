@@ -3,12 +3,18 @@ from mesa.visualization.modules import CanvasGrid, ChartModule, TextElement, Bar
 from mesa.visualization.UserParam import UserSettableParameter
 
 from CivilViolenceModel import CivilViolenceModel
-from CivilViolenceAgents import PopulationAgent, CopAgent
+from CivilViolenceAgents import PopulationAgent, CopAgent,PropagandaAgent
 
 COP_COLOR = "#000000"
 AGENT_QUIET_COLOR = "#0066CC"
 AGENT_REBEL_COLOR = "#CC0000"
 JAIL_COLOR = "#757575"
+
+PROPAGANDA_AGENT_COLOR_JAIL = "#00FF00"
+
+PROPAGANDA_AGENT_COLOR_OUT_JAIL = "#FF4500"
+
+
 
 
 def citizen_cop_portrayal(agent):
@@ -19,7 +25,23 @@ def citizen_cop_portrayal(agent):
                  "x": agent.pos[0], "y": agent.pos[1],
                  "Filled": "true"}
 
-    if isinstance(agent, PopulationAgent):
+
+
+    if isinstance(agent, PropagandaAgent):
+        '''
+        Color for propaganda agent will always remain either out of jail or in jail, it wont have any activation, he is always active
+        '''
+        # color = AGENT_QUIET_COLOR if not agent.active else \
+        #     AGENT_REBEL_COLOR
+        color = PROPAGANDA_AGENT_COLOR_JAIL if agent.jail_time else PROPAGANDA_AGENT_COLOR_OUT_JAIL
+        portrayal['Shape'] = 'rect'
+        portrayal["Color"] = color
+        portrayal["w"] = 0.8
+        portrayal["h"] = 0.8
+        portrayal["Layer"] = 0
+
+
+    elif isinstance(agent, PopulationAgent):
         color = AGENT_QUIET_COLOR if not agent.active else \
             AGENT_REBEL_COLOR
         color = JAIL_COLOR if agent.jail_time else color
@@ -42,6 +64,13 @@ model_params = {
         0,
         100,
         description="Initial percentage of citizen in population"),
+    "propaganda_agent_density": UserSettableParameter(
+        "slider",
+        "Propaganda Agent Density",
+        20,
+        0,
+        100,
+        description="Initial percentage of propaganda agent in population"),
     "cop_density": UserSettableParameter(
         "slider",
         "Cop Density",
@@ -80,7 +109,12 @@ model_params = {
     "movement": UserSettableParameter(
         "checkbox",
         "Movement",
-        True)}
+        True),
+    "propaganda_allowed": UserSettableParameter(
+        "checkbox",
+        "Allow Propaganda",
+        True)
+}
 
 line_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                           {"Label": "Active", "Color": AGENT_REBEL_COLOR},

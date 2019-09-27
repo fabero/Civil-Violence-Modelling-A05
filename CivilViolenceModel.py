@@ -4,7 +4,9 @@ from mesa.time import RandomActivation
 from mesa.space import Grid
 from mesa.datacollection import DataCollector
 
-from CivilViolenceAgents import PopulationAgent, CopAgent
+from CivilViolenceAgents import PopulationAgent, CopAgent,PropagandaAgent
+
+from settings import POPULATION_AGENT_CLASS,PROPAGANDA_AGENT_CLASS,COP_AGENT_CLASS
 
 
 class CivilViolenceModel(Model):
@@ -32,6 +34,11 @@ class CivilViolenceModel(Model):
         max_iters: model may not have a natural stopping point, so we set a
             max.
 
+        propaganda_agent_density: % of propaganda agent
+
+        propaganda_allowed: True if we are allowing propaganda
+
+
     """
 
     def __init__(
@@ -47,12 +54,16 @@ class CivilViolenceModel(Model):
             active_threshold=.1,
             arrest_prob_constant=2.3,
             movement=True,
-            max_iters=1000):
+            max_iters=1000,
+            propaganda_agent_density=20,
+            propaganda_allowed=True,
+    ):
         super().__init__()
         self.height = height
         self.width = width
         self.citizen_density = citizen_density / 100
         self.cop_density = cop_density / 100
+        self.propaganda_agent_density = propaganda_agent_density/100
         self.citizen_vision = citizen_vision
         self.cop_vision = cop_vision
         self.legitimacy = legitimacy / 100
@@ -66,6 +77,8 @@ class CivilViolenceModel(Model):
         self.iteration = 0
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=True)
+
+        self.propaganda_allowed = propaganda_allowed
 
         # initiate data collectors for agent state feedback
         model_reporters = {
@@ -116,6 +129,18 @@ class CivilViolenceModel(Model):
                 self.grid[y][x] = citizen
                 self.schedule.add(citizen)
 
+            elif (self.random.random() < self.cop_density + self.citizen_density + self.propaganda_agent_density) and propaganda_allowed:
+                citizen = PropagandaAgent(unique_id, self,
+                                          hardship=self.random.random(),
+                                          legitimacy=self.legitimacy,
+                                          risk_aversion=self.random.random(),
+                                          threshold=self.active_threshold,
+                                          vision=self.citizen_vision,
+                                          pos=(x, y))
+                unique_id += 1
+                self.grid[y][x] = citizen
+                self.schedule.add(citizen)
+
         self.running = True
         self.datacollector.collect(self)
 
@@ -134,7 +159,7 @@ class CivilViolenceModel(Model):
         """
         count = 0
         for agent in model.schedule.agents:
-            if agent.agent_class == 'cop':
+            if agent.agent_class == COP_AGENT_CLASS:
                 continue
             if exclude_jailed and agent.jail_time:
                 continue
@@ -147,10 +172,10 @@ class CivilViolenceModel(Model):
     @staticmethod
     def count_jailed(model):
         """
-        Helper method to count jailed agents.
+        Helper method to count jailed agents. (Both propaganda and population)
         """
         count = 0
         for agent in model.schedule.agents:
-            if agent.agent_class == 'population' and agent.jail_time:
+            if agent.agent_class in [POPULATION_AGENT_CLASS,PROPAGANDA_AGENT_CLASS] and agent.jail_time:
                 count += 1
         return count
