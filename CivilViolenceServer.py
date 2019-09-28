@@ -1,7 +1,7 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
-from hex_gradients import linear_gradient
+from utils.hex_gradients import linear_gradient
 
 from CivilViolenceAgents import PopulationAgent, CopAgent, PropagandaAgent
 from CivilViolenceModel import CivilViolenceModel
