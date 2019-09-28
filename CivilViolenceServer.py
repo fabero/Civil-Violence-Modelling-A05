@@ -13,17 +13,22 @@ JAIL_COLOR = "#757575"
 
 PROPAGANDA_AGENT_COLOR_JAIL = "#000000"
 
-PROPAGANDA_AGENT_COLOR_OUT_JAIL = "#FF4500"
-
-# we map hex value in one direction
-# using a start hex value and an end hex value
+# start and end hex values for propaganda of an agent
 start_prop = "#FFEBE3"
 end_prop = "#FF4500"
 
-start_suscep = "#93C5F5"
-end_suscep = "#007FFA"
+# we generate an array of hex values in between start and end hex values
+# in order to represent agents with an array of propaganda values
+# in the grid
 grad_propaganda = linear_gradient(start_prop, end_prop, n=100)['hex']
 
+# start and end hex values for susceptibility value of an agent
+start_suscep = "#93C5F5"
+end_suscep = "#007FFA"
+
+# we generate an array of hex values in between start and end hex values
+# in order to represent agents with an array of susceptibility values
+# in the grid
 grad_suceptibility = linear_gradient(start_suscep, end_suscep, n=100)['hex']
 
 def citizen_cop_portrayal(agent):
@@ -39,8 +44,8 @@ def citizen_cop_portrayal(agent):
         '''
         Color for propaganda agent will always remain either out of jail or in jail, it wont have any activation, he is always active
         '''
-        # assigning a color from gradient of colors
-        # depending on the propaganda value of the agent
+        # assigning a color from gradient of colors in grad_propaganda list
+        # depending on the intensity propaganda value of the agent
 
         propaganda_value = int(agent.propaganda_value * 100)
 
@@ -55,8 +60,8 @@ def citizen_cop_portrayal(agent):
 
     elif isinstance(agent, PopulationAgent):
 
-        # initializing agents depending on their susceptibility values
-
+        # assigning a color from gradient of colors in grad_susceptibility list
+        # depending on the intensity propaganda value of the agent
         susceptibility_value = int(agent.susceptibility * 100)
 
         color = grad_suceptibility[susceptibility_value] if not agent.active else \

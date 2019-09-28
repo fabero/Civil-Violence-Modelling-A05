@@ -40,8 +40,3 @@ def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
     RGB_list.append(curr_vector)
 
   return color_dict(RGB_list)
-
-start = "#FFE5DB"
-end = "#FF4500"
-
-print(linear_gradient(start, end, n=100)['hex'])
