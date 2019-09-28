@@ -1,6 +1,6 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
-from mesa.visualization.modules import CanvasGrid, ChartModule
+from mesa.visualization.modules import CanvasGrid, ChartModule, PieChartModule
 from hex_gradients import linear_gradient
 
 from CivilViolenceAgents import PopulationAgent, CopAgent, PropagandaAgent
@@ -99,11 +99,16 @@ model_params = {
 
 line_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                           {"Label": "Active", "Color": AGENT_REBEL_COLOR},
-                          {"Label": "Jailed", "Color": JAIL_COLOR}], 50, 125)
+                          {"Label": "Jailed", "Color": JAIL_COLOR},
+                          {"Label": "Active Propaganda Agents", "Color": end_prop}], 100, 270)
 
+pie_chart = PieChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
+                            {"Label": "Active", "Color": AGENT_REBEL_COLOR},
+                            {"Label": "Jailed", "Color": JAIL_COLOR},
+                            {"Label": "Active Propaganda Agents", "Color": end_prop}], 200, 500)
 
-canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 640, 640)
-server = ModularServer(CivilViolenceModel, [canvas_element, line_chart],
+canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
+server = ModularServer(CivilViolenceModel, [canvas_element, pie_chart, line_chart],
                        "Epstein Civil Violence Model 1", model_params)
 
 # launch server

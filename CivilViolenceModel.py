@@ -84,7 +84,8 @@ class CivilViolenceModel(Model):
         model_reporters = {
             "Quiescent": lambda m: self.count_type_citizens(m, False),
             "Active": lambda m: self.count_type_citizens(m, True),
-            "Jailed": lambda m: self.count_jailed(m)}
+            "Jailed": lambda m: self.count_jailed(m),
+            "Active Propaganda Agents": lambda m: self.count__active_propaganda_agent(m)}
 
         agent_reporters = {
             "x": lambda a: a.pos[0],
@@ -176,6 +177,17 @@ class CivilViolenceModel(Model):
         """
         count = 0
         for agent in model.schedule.agents:
-            if agent.agent_class in [POPULATION_AGENT_CLASS,PROPAGANDA_AGENT_CLASS] and agent.jail_time:
+            if agent.agent_class in [POPULATION_AGENT_CLASS, PROPAGANDA_AGENT_CLASS] and agent.jail_time:
+                count += 1
+        return count
+
+    @staticmethod
+    def count__active_propaganda_agent(model):
+        """
+        Helper method to count jailed agents. (Both propaganda and population)
+        """
+        count = 0
+        for agent in model.schedule.agents:
+            if agent.agent_class in [PROPAGANDA_AGENT_CLASS] and not agent.jail_time:
                 count += 1
         return count
