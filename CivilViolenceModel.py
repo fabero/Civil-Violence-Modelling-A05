@@ -51,7 +51,7 @@ class CivilViolenceModel(Model):
             cop_vision=7,
             legitimacy=82,
             max_jail_term=30,
-            active_threshold=10,
+            active_threshold=13,
             arrest_prob_constant=2.3,
             movement=True,
             max_iters=1000,
