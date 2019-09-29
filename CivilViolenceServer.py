@@ -79,9 +79,9 @@ def citizen_cop_portrayal(agent):
 
 
 model_params = {
-    "citizen_density": UserSettableParameter("slider", "Citizen Density", 70, 0, 100,
+    "citizen_density": UserSettableParameter("slider", "Citizen Density", 60, 0, 100,
         description="Initial percentage of citizen in population"),
-    "propaganda_agent_density": UserSettableParameter("slider", "Propaganda Agent Density", 20, 0, 100,
+    "propaganda_agent_density": UserSettableParameter("slider", "Propaganda Agent Density", 10, 0, 100,
         description="Initial percentage of propaganda agent in population"),
     "cop_density": UserSettableParameter("slider", "Cop Density", 4, 0, 100,
         description="Initial percentage of cops in population"),
@@ -89,6 +89,8 @@ model_params = {
         description="Number of patches visible to cops"),
     "citizen_vision": UserSettableParameter("slider", "Citizen Vision", 7, 0, 10,
         description="Number of patches visible to citizens"),
+    "active_threshold": UserSettableParameter("slider", "Active Threshold", 10, 0, 100,
+        description="Threshold that agent's Grievance must exceed Net Risk to go active"),
     "legitimacy": UserSettableParameter("slider", "Government Legitimacy", 82, 0, 100,
         description="Global parameter: Government legitimacy"),
     "max_jail_term": UserSettableParameter("slider", "Max Jail Term", 30, 0, 1000,
