@@ -1,7 +1,7 @@
 import math
+import random
 
 from mesa import Agent
-import random
 from settings import PROPAGANDA_AGENT_CLASS,POPULATION_AGENT_CLASS,COP_AGENT_CLASS
 
 
@@ -89,7 +89,6 @@ class PopulationAgent(Agent):
 
         #propaganda_effect = (self.susceptibility * propaganda_in_vision)/1000 #TODO: Look into number by which we are dividing, make it dynamic
         propaganda_effect = self.susceptibility * propaganda_in_vision
-        print(propaganda_effect,'Propaganda in Vision')
         return propaganda_effect
 
     def step(self):
@@ -262,7 +261,7 @@ class PropagandaAgent(PopulationAgent):
         self.agent_class = PROPAGANDA_AGENT_CLASS
 
         self.propaganda_value = PropagandaAgent._get_val_from_uniform_() #Every propaganda agent has different propaganda value
-
+        self.susceptibility = 1 # Every propaganda agent is fully susceptible to propaganda as they are the ones spreading it
 
 
     def step(self):
@@ -278,8 +277,6 @@ class PropagandaAgent(PopulationAgent):
             if self.jail_time:
                 self.active = False
             return
-
-        self.active = True #propaganda agent will always be active, if not in jail
 
         # position of neighborhood cells
         self.neighborhood = self.model.grid.get_neighborhood(
@@ -315,7 +312,50 @@ class PropagandaAgent(PopulationAgent):
         self.arrest_probability = (
                 1 - math.exp(-1 * self.model.arrest_prob_constant * self.ratio_c_a))
 
+
+        # calculating net_risk given risk aversion and arrest probability
+        # we further calculate a bool value if difference of grievance and net_risk
+        # is greater than threshold value which is defined as 0.1 in net logo
+        # implementation
+        #First update grievance
+        self.grievance = self.cal_change_in_grievance_due_to_propaganda()
+        self.net_risk = self.risk_aversion * self.arrest_probability
+        thresh_bool = (self.grievance - self.net_risk) > self.threshold
+
+        # simple state transition rule A for population agent
+        # Case 1: if state is inactive and thresh bool is true
+        # then transition to an active state, set active flag to true
+        # Case 2: if active flag is true but thresh bool has changed to false
+        # then transition back to inactive state
+        if not self.active and thresh_bool:
+            self.active = True
+        elif self.active and not thresh_bool:
+            self.active = False
+
         # randomly move to an empty neighborhood cell
         if self.model.movement and self.empty_cells:
             new_pos = self.random.choice(self.empty_cells)
             self.model.grid.move_agent(self, new_pos)
+
+        '''
+    This function will update grievance value due to propaganda
+    '''
+    def cal_change_in_grievance_due_to_propaganda(self):
+        #return a weighted average of Epstein's Grievance with the modeled propaganda effect defined dynamically
+        w2 = self.propaganda_factor
+        w1 = 1 - w2
+        grievance = w1 * self.grievance + w2 * 1 #propaganda_effect =1 for propaganda agents
+        return grievance
+
+    def cal_propaganda_effect(self):
+        #Calculate propaganda effect due to propaganda agents in the vision of current agent.
+
+        #Calculate total propaganda parameter in the neighbourhood
+        propaganda_in_vision = 0
+        for agent in self.neighbors:
+            if agent.agent_class == PROPAGANDA_AGENT_CLASS and agent.active and not agent.jail_time:
+                propaganda_in_vision += agent.propaganda_value
+
+        #propaganda_effect = (self.susceptibility * propaganda_in_vision)/1000 #TODO: Look into number by which we are dividing, make it dynamic
+        propaganda_effect = self.susceptibility * propaganda_in_vision
+        return propaganda_effect

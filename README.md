@@ -1,9 +1,7 @@
 # Introduction
-Implementation of Simulation 1 from Epstein's paper ["Modeling civil violence: an agent-based computational approach"](https://www.semanticscholar.org/paper/Modeling-civil-violence%3A-an-agent-based-approach.-Epstein/012d71badb72df66a59c306dc597b4c96d783083). 
+Implementation of Simulation 1 from Epstein's paper ["Modeling civil violence: an agent-based computational approach"](https://www.semanticscholar.org/paper/Modeling-civil-violence%3A-an-agent-based-approach.-Epstein/012d71badb72df66a59c306dc597b4c96d783083), augmented to further model the spread of propaganda in favour of rebellion amongst citizens. 
 
-Implementation is based on the given examples of the [mesa framework](https://github.com/projectmesa/mesa/tree/master/examples/epstein_civil_violence)
-
-but modified so that the simulation demonstrates the system punctuated equilibria that Epstein describes in his paper. The modifications are based on the [NetLogo implementation](https://ccl.northwestern.edu/netlogo/models/Rebellion).
+Baseline mplementation is based on the given examples of the [mesa framework](https://github.com/projectmesa/mesa/tree/master/examples/epstein_civil_violence), but modified so that the simulation demonstrates the system punctuated equilibria that Epstein describes in his paper. The modifications are based on the [NetLogo implementation](https://ccl.northwestern.edu/netlogo/models/Rebellion).
 
 
 # Packages Required
@@ -13,7 +11,7 @@ but modified so that the simulation demonstrates the system punctuated equilibri
 # Run
 - python CivilViolenceServer.py
 
-# Differences from mesa original implementation:
+# Baseline: Differences from mesa original implementation
 
 - ``portrayal.py``, this is actually rendundant and it's embedded inside CivilVioleneServer.py and called locally.
 
@@ -23,3 +21,11 @@ but modified so that the simulation demonstrates the system punctuated equilibri
         
  - ``CivilViolenceModel.py``, the same, only the parameters as of NetLogo's model are given, and also percentages are scaled to [0,100] instead of [0,1]
   to be able to reconfigure them from webserver
+
+# Alpha Version: Implementing propaganda agents
+For our current experimental setup, the 70% of population is divided in 60% citizens - 10% propaganda agents. Propaganda agents spread propaganda to their local vision with a uniformly distributed influence, which affects the desicion of population agents to rebel by introfucing a new factor to their grievance variable, called Propaganda Effect (PE). By properly adjusting the model parameters, we see the effect of propaganda agents in the system's equilibria in the figures below: 
+- Baseline Model (Epstein). The system equilibria described in Epstein's paper.
+    ![Screenshot](https://github.com/fabero/Civil-Violence-Modelling-A05/blob/giorgos/figures/Selection_006.jpg)
+- Alpha Version Model. We see the effect that propaganda agents have in the simulation, namely: a) Increase in rebellion outburst, as well as time in it (the slope of the red curves), b) Increase in rebellion outburst frequency, as witnessed by viewing the spikes in the x-axis, c) Finally converge in a state where most citizens are steadily in jail and so no more rebellions can outburst.
+    ![Screenshot](https://github.com/fabero/Civil-Violence-Modelling-A05/blob/giorgos/figures/Selection_004.jpg)
+
