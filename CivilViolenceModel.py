@@ -45,17 +45,17 @@ class CivilViolenceModel(Model):
             self,
             height=40,
             width=40,
-            citizen_density=70,
+            citizen_density=60,
             cop_density=4,
             citizen_vision=7,
             cop_vision=7,
             legitimacy=82,
             max_jail_term=30,
-            active_threshold=.1,
+            active_threshold=10,
             arrest_prob_constant=2.3,
             movement=True,
             max_iters=1000,
-            propaganda_agent_density=20,
+            propaganda_agent_density=10,
             propaganda_factor=1,
     ):
         super().__init__()
@@ -63,12 +63,12 @@ class CivilViolenceModel(Model):
         self.width = width
         self.citizen_density = citizen_density / 100
         self.cop_density = cop_density / 100
-        self.propaganda_agent_density = propaganda_agent_density/100
+        self.propaganda_agent_density = propaganda_agent_density / 100
         self.citizen_vision = citizen_vision
         self.cop_vision = cop_vision
         self.legitimacy = legitimacy / 100
         self.max_jail_term = max_jail_term
-        self.active_threshold = active_threshold
+        self.active_threshold = active_threshold / 100
         self.arrest_prob_constant = arrest_prob_constant
         self.movement = movement
         self.max_iters = max_iters
@@ -100,9 +100,9 @@ class CivilViolenceModel(Model):
                                            agent_reporters=agent_reporters)
 
         unique_id = 0
-        if self.cop_density + self.citizen_density > 1:
+        if self.cop_density + self.citizen_density + self.propaganda_agent_density > 1:
             raise ValueError(
-                'Cop density + citizen density must be less than 1')
+                'Cop density + citizen density + propaganda agent density must be less than 1')
 
         # initialize agents in the grid with respect to the given densities
         for (contents, x, y) in self.grid.coord_iter():
