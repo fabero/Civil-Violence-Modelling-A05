@@ -23,4 +23,4 @@ Baseline mplementation is based on the given examples of the [mesa framework](ht
   to be able to reconfigure them from webserver
 
 # Alpha Version: Implementing propaganda agents
-For our current experimental setup, the 70% of population is divided in 60% citizens - 10% propaganda agents. Propaganda agents spread propaganda to their local vision with a uniformly distributed influence, which affects the desicion of population agents to rebel by introfucing a new factor to their grievance variable, called Propaganda Effect (PE). Their new grievance (G') is now calculated as: $a_i$
+For our current experimental setup, the 70% of population is divided in 60% citizens - 10% propaganda agents. Propaganda agents spread propaganda to their local vision with a uniformly distributed influence, which affects the desicion of population agents to rebel by introfucing a new factor to their grievance variable, called Propaganda Effect (PE). Their new grievance (G') is now calculated as:  h<sub>&theta;</sub>(x) = &theta;<sub>o</sub> x + &theta;<sub>1</sub>x
