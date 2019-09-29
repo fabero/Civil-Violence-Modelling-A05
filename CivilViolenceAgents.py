@@ -38,6 +38,8 @@ class PopulationAgent(Agent):
             legitimacy,
             risk_aversion,
             threshold,
+            susceptibility,
+            propaganda_factor,
             vision,
             pos,
     ):
@@ -72,7 +74,8 @@ class PopulationAgent(Agent):
         self.arrest_probability = None
         self.pos = pos
 
-        self.susceptibility = PopulationAgent._get_val_from_uniform_() #Define how susceptible agent is to propagand
+        self.susceptibility = susceptibility
+        self.propaganda_factor = propaganda_factor
 
     def cal_propaganda_effect(self):
         #Calculate propaganda effect due to propaganda agents in the vision of current agent.
@@ -84,7 +87,8 @@ class PopulationAgent(Agent):
             if agent.agent_class == PROPAGANDA_AGENT_CLASS and agent.active and not agent.jail_time:
                 propaganda_in_vision += agent.propaganda_value
 
-        propaganda_effect = (self.susceptibility * propaganda_in_vision)/1000 #TODO: Look into number by which we are dividing, make it dynamic
+        #propaganda_effect = (self.susceptibility * propaganda_in_vision)/1000 #TODO: Look into number by which we are dividing, make it dynamic
+        propaganda_effect = self.susceptibility * propaganda_in_vision
         print(propaganda_effect,'Propaganda in Vision')
         return propaganda_effect
 
@@ -169,7 +173,10 @@ class PopulationAgent(Agent):
     This function will update grievance value due to propaganda
     '''
     def cal_change_in_grievance_due_to_propaganda(self):
-        grievance = self.grievance + self.cal_propaganda_effect() #addition in grievance due to propaganda effect
+        #return a weighted average of Epstein's Grievance with the modeled propaganda effect defined dynamically
+        w2 = self.propaganda_factor
+        w1 = 1 - w2
+        grievance = w1 * self.grievance + w2 * self.cal_propaganda_effect() #addition in grievance due to propaganda effect
         return grievance
 
 
