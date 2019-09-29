@@ -93,8 +93,8 @@ model_params = {
         description="Global parameter: Government legitimacy"),
     "max_jail_term": UserSettableParameter("slider", "Max Jail Term", 30, 0, 1000,
         description="Maximum number of steps that jailed citizens stay in"),
-    "movement": UserSettableParameter("checkbox", "Movement", True),
-    "propaganda_allowed": UserSettableParameter("checkbox", "Allow Propaganda", True)
+    "propaganda_factor": UserSettableParameter("slider", "Propaganda Factor", 1, 0, 1000),
+    "movement": UserSettableParameter("checkbox", "Movement", True)
 }
 
 line_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
