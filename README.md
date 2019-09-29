@@ -11,7 +11,7 @@ Baseline mplementation is based on the given examples of the [mesa framework](ht
 # Run
 - python CivilViolenceServer.py
 
-# Differences from mesa original implementation:
+# Baseline: Differences from mesa original implementation:
 
 - ``portrayal.py``, this is actually rendundant and it's embedded inside CivilVioleneServer.py and called locally.
 
@@ -21,3 +21,7 @@ Baseline mplementation is based on the given examples of the [mesa framework](ht
         
  - ``CivilViolenceModel.py``, the same, only the parameters as of NetLogo's model are given, and also percentages are scaled to [0,100] instead of [0,1]
   to be able to reconfigure them from webserver
+
+# Alpha Version: Implementing propaganda agents:
+For our current experimental setup, the 70% of population is divided in 60% citizens - 10% propaganda agents. Propaganda agents spread propaganda to their local vision with a uniformly distributed influence, which affects the desicion of population agents to rebel by introfucing a new factor to their grievance variable, called Propaganda Effect (PE). Their new grievance (G') is now calculated as:
+        $G' = (1-\pi)\cdot G + \pi \cdot PE, \;$
