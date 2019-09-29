@@ -56,7 +56,7 @@ class CivilViolenceModel(Model):
             movement=True,
             max_iters=1000,
             propaganda_agent_density=20,
-            propaganda_allowed=True,
+            propaganda_factor=1,
     ):
         super().__init__()
         self.height = height
@@ -78,7 +78,7 @@ class CivilViolenceModel(Model):
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=True)
 
-        self.propaganda_allowed = propaganda_allowed
+        self.propaganda_factor = propaganda_factor / 1000
 
         # initiate data collectors for agent state feedback
         model_reporters = {
@@ -124,18 +124,22 @@ class CivilViolenceModel(Model):
                                           legitimacy=self.legitimacy,
                                           risk_aversion=self.random.random(),
                                           threshold=self.active_threshold,
+                                          susceptibility=self.random.random(),
+                                          propaganda_factor=self.propaganda_factor,
                                           vision=self.citizen_vision,
                                           pos=(x, y))
                 unique_id += 1
                 self.grid[y][x] = citizen
                 self.schedule.add(citizen)
 
-            elif (self.random.random() < self.cop_density + self.citizen_density + self.propaganda_agent_density) and propaganda_allowed:
+            elif (self.random.random() < self.cop_density + self.citizen_density + self.propaganda_agent_density):
                 citizen = PropagandaAgent(unique_id, self,
                                           hardship=self.random.random(),
                                           legitimacy=self.legitimacy,
                                           risk_aversion=self.random.random(),
                                           threshold=self.active_threshold,
+                                          susceptibility=self.random.random(),
+                                          propaganda_factor=self.propaganda_factor,
                                           vision=self.citizen_vision,
                                           pos=(x, y))
                 unique_id += 1
