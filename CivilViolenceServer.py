@@ -89,7 +89,7 @@ model_params = {
         description="Number of patches visible to cops"),
     "citizen_vision": UserSettableParameter("slider", "Citizen Vision", 7, 0, 10,
         description="Number of patches visible to citizens"),
-    "active_threshold": UserSettableParameter("slider", "Active Threshold", 10, 0, 100,
+    "active_threshold": UserSettableParameter("slider", "Active Threshold", 13, 0, 100,
         description="Threshold that agent's Grievance must exceed Net Risk to go active"),
     "legitimacy": UserSettableParameter("slider", "Government Legitimacy", 82, 0, 100,
         description="Global parameter: Government legitimacy"),
