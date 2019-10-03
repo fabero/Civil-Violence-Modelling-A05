@@ -11,8 +11,6 @@ AGENT_QUIET_COLOR = "#0066CC"
 AGENT_REBEL_COLOR = "#CC0000"
 JAIL_COLOR = "#757575"
 
-PROPAGANDA_AGENT_COLOR_JAIL = "#000000"
-
 # start and end hex values for propaganda of an agent
 start_prop = "#FFEBE3"
 end_prop = "#FF4500"
@@ -47,9 +45,9 @@ def citizen_cop_portrayal(agent):
         # assigning a color from gradient of colors in grad_propaganda list
         # depending on the intensity propaganda value of the agent
 
-        propaganda_value = int(agent.propaganda_value * 100)
+        propaganda_value = int(agent.influence * 100)
 
-        color = PROPAGANDA_AGENT_COLOR_JAIL if agent.jail_time else grad_propaganda[propaganda_value]
+        color = JAIL_COLOR if agent.jail_time else grad_propaganda[propaganda_value]
         # color = PROPAGANDA_AGENT_COLOR_JAIL if agent.jail_time else PROPAGANDA_AGENT_COLOR_OUT_JAIL
         portrayal['Shape'] = 'rect'
         portrayal["Color"] = color
@@ -79,9 +77,9 @@ def citizen_cop_portrayal(agent):
 
 
 model_params = {
-    "citizen_density": UserSettableParameter("slider", "Citizen Density", 60, 0, 100,
+    "citizen_density": UserSettableParameter("slider", "Citizen Density", 70, 0, 100,
         description="Initial percentage of citizen in population"),
-    "propaganda_agent_density": UserSettableParameter("slider", "Propaganda Agent Density", 10, 0, 100,
+    "propaganda_agent_density": UserSettableParameter("slider", "Propaganda Agent Density", 2, 0, 100,
         description="Initial percentage of propaganda agent in population"),
     "cop_density": UserSettableParameter("slider", "Cop Density", 4, 0, 100,
         description="Initial percentage of cops in population"),
@@ -89,13 +87,16 @@ model_params = {
         description="Number of patches visible to cops"),
     "citizen_vision": UserSettableParameter("slider", "Citizen Vision", 7, 0, 10,
         description="Number of patches visible to citizens"),
-    "active_threshold": UserSettableParameter("slider", "Active Threshold", 13, 0, 100,
+    "active_threshold": UserSettableParameter("slider", "Active Threshold", 10, 0, 100,
         description="Threshold that agent's Grievance must exceed Net Risk to go active"),
     "legitimacy": UserSettableParameter("slider", "Government Legitimacy", 82, 0, 100,
         description="Global parameter: Government legitimacy"),
     "max_jail_term": UserSettableParameter("slider", "Max Jail Term", 30, 0, 1000,
         description="Maximum number of steps that jailed citizens stay in"),
-    "propaganda_factor": UserSettableParameter("slider", "Propaganda Factor", 1, 0, 1000),
+    "propaganda_factor": UserSettableParameter("slider", "Propaganda Factor", 1, 0, 1000,
+        description="Importance of propaganda effect in agent Grievance"),
+    "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 5000, 0, 10000,
+        description="Threshold that propaganda agent's influence must exceed to become epxosed to cops"),
     "movement": UserSettableParameter("checkbox", "Movement", True)
 }
 
