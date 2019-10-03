@@ -45,18 +45,19 @@ class CivilViolenceModel(Model):
             self,
             height=40,
             width=40,
-            citizen_density=60,
+            citizen_density=70,
             cop_density=4,
             citizen_vision=7,
             cop_vision=7,
             legitimacy=82,
             max_jail_term=30,
-            active_threshold=13,
+            active_threshold=10,
             arrest_prob_constant=2.3,
             movement=True,
             max_iters=1000,
-            propaganda_agent_density=10,
+            propaganda_agent_density=2,
             propaganda_factor=1,
+            exposure_threshold=5000,
     ):
         super().__init__()
         self.height = height
@@ -79,13 +80,14 @@ class CivilViolenceModel(Model):
         self.grid = Grid(height, width, torus=True)
 
         self.propaganda_factor = propaganda_factor / 1000
+        self.exposure_threshold = exposure_threshold
 
         # initiate data collectors for agent state feedback
         model_reporters = {
             "Quiescent": lambda m: self.count_type_citizens(m, False),
             "Active": lambda m: self.count_type_citizens(m, True),
             "Jailed": lambda m: self.count_jailed(m),
-            "Active Propaganda Agents": lambda m: self.count__active_propaganda_agent(m)}
+            "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m)}
 
         agent_reporters = {
             "x": lambda a: a.pos[0],
@@ -106,7 +108,17 @@ class CivilViolenceModel(Model):
 
         # initialize agents in the grid with respect to the given densities
         for (contents, x, y) in self.grid.coord_iter():
-            if self.random.random() < self.cop_density:
+            if self.random.random() < self.propaganda_agent_density:
+                agent = PropagandaAgent(unique_id, self,
+                                          influence = self.random.random(),
+                                          exposure_threshold = self.exposure_threshold,
+                                          vision=self.citizen_vision,
+                                          pos=(x,y))
+                unique_id += 1
+                self.grid[y][x] = agent
+                self.schedule.add(agent)
+
+            elif self.random.random() < self.cop_density + self.propaganda_agent_density:
                 cop = CopAgent(
                     unique_id,
                     self,
@@ -118,22 +130,8 @@ class CivilViolenceModel(Model):
                 self.grid[y][x] = cop
                 self.schedule.add(cop)
 
-            elif self.random.random() < self.cop_density + self.citizen_density:
-                citizen = PopulationAgent(unique_id, self,
-                                          hardship=self.random.random(),
-                                          legitimacy=self.legitimacy,
-                                          risk_aversion=self.random.random(),
-                                          threshold=self.active_threshold,
-                                          susceptibility=self.random.random(),
-                                          propaganda_factor=self.propaganda_factor,
-                                          vision=self.citizen_vision,
-                                          pos=(x, y))
-                unique_id += 1
-                self.grid[y][x] = citizen
-                self.schedule.add(citizen)
-
             elif (self.random.random() < self.cop_density + self.citizen_density + self.propaganda_agent_density):
-                citizen = PropagandaAgent(unique_id, self,
+                citizen = PopulationAgent(unique_id, self,
                                           hardship=self.random.random(),
                                           legitimacy=self.legitimacy,
                                           risk_aversion=self.random.random(),
@@ -164,7 +162,7 @@ class CivilViolenceModel(Model):
         """
         count = 0
         for agent in model.schedule.agents:
-            if agent.agent_class == COP_AGENT_CLASS:
+            if agent.agent_class in [COP_AGENT_CLASS, PROPAGANDA_AGENT_CLASS]:
                 continue
             if exclude_jailed and agent.jail_time:
                 continue
@@ -186,7 +184,7 @@ class CivilViolenceModel(Model):
         return count
 
     @staticmethod
-    def count__active_propaganda_agent(model):
+    def count_propaganda_agents(model):
         """
         Helper method to count jailed agents. (Both propaganda and population)
         """
