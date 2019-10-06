@@ -99,7 +99,7 @@ class CivilViolenceModel(Model):
                                            agent_reporters=agent_reporters)
 
         unique_id = 0
-        if self.cop_density + self.citizen_density > 1:
+        if self.cop_density + self.citizen_density + self.propaganda_agent_density> 1:
             raise ValueError(
                 'Cop density + citizen density must be less than 1')
 
