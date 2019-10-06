@@ -1,7 +1,7 @@
 import math
+import random
 
 from mesa import Agent
-import random
 from settings import PROPAGANDA_AGENT_CLASS,POPULATION_AGENT_CLASS,COP_AGENT_CLASS
 
 
@@ -38,6 +38,8 @@ class PopulationAgent(Agent):
             legitimacy,
             risk_aversion,
             threshold,
+            susceptibility,
+            propaganda_factor,
             vision,
             pos,
     ):
@@ -72,7 +74,8 @@ class PopulationAgent(Agent):
         self.arrest_probability = None
         self.pos = pos
 
-        self.susceptibility = PopulationAgent._get_val_from_uniform_() #Define how susceptible agent is to propagand
+        self.susceptibility = susceptibility
+        self.propaganda_factor = propaganda_factor
 
     def cal_propaganda_effect(self):
         #Calculate propaganda effect due to propaganda agents in the vision of current agent.
@@ -80,12 +83,20 @@ class PopulationAgent(Agent):
 
         #Calculate total propaganda parameter in the neighbourhood
         propaganda_in_vision = 0
+        count = 0
         for agent in self.neighbors:
-            if agent.agent_class == PROPAGANDA_AGENT_CLASS and agent.active and not agent.jail_time:
-                propaganda_in_vision += agent.propaganda_value
+            if agent.agent_class == PROPAGANDA_AGENT_CLASS and not agent.jail_time:
+                count +=1
+                propaganda_in_vision += agent.influence
 
-        propaganda_effect = (self.susceptibility * propaganda_in_vision)/1000 #TODO: Look into number by which we are dividing, make it dynamic
-        print(propaganda_effect,'Propaganda in Vision')
+        #Remarks: count could have been zero.
+        if count !=0:
+            propaganda_in_vision = propaganda_in_vision/count
+        else:
+            propaganda_in_vision = 0
+
+        #propaganda_effect = (self.susceptibility * propaganda_in_vision)/1000 #TODO: Look into number by which we are dividing, make it dynamic
+        propaganda_effect = self.susceptibility * propaganda_in_vision #/ self.model.count_propaganda_agents(self.model)
         return propaganda_effect
 
     def step(self):
@@ -129,7 +140,7 @@ class PopulationAgent(Agent):
         # agent counts herself as active when estimating arrest probability
         actives_in_vision = 1
         for agent in self.neighbors:
-            if agent.agent_class in [POPULATION_AGENT_CLASS,PROPAGANDA_AGENT_CLASS] and agent.active and not agent.jail_time:
+            if agent.agent_class in [POPULATION_AGENT_CLASS] and agent.active and not agent.jail_time:
                 actives_in_vision += 1
 
         # defining arrest probability for each agent
@@ -169,7 +180,8 @@ class PopulationAgent(Agent):
     This function will update grievance value due to propaganda
     '''
     def cal_change_in_grievance_due_to_propaganda(self):
-        grievance = self.grievance + self.cal_propaganda_effect() #addition in grievance due to propaganda effect
+        #return a weighted average of Epstein's Grievance with the modeled propaganda effect defined dynamically
+        grievance = (1 * self.grievance + self.propaganda_factor * self.cal_propaganda_effect()) / (1 + self.propaganda_factor)
         return grievance
 
 
@@ -215,29 +227,37 @@ class CopAgent(Agent):
         self.empty_cells = [
             cell for cell in self.neighborhood if self.model.grid.is_cell_empty(cell)]
 
-        # find the number of active agents in neighborhood
-        actives = []
+        # find the number of visible propaganda agents and active population agents in neighborhood
+        actives, propagandas = [], []
         for agent in self.neighbors:
-            if agent.agent_class in [POPULATION_AGENT_CLASS,PROPAGANDA_AGENT_CLASS] and agent.active and not agent.jail_time:
+            if agent.agent_class in [POPULATION_AGENT_CLASS] and agent.active and not agent.jail_time:
                 actives.append(agent)
+            elif agent.agent_class in [PROPAGANDA_AGENT_CLASS] and agent.visible_to_cops and not agent.jail_time:
+                propagandas.append(agent)
+
+        # priority of arrest to exposed propaganda agents
+        if propagandas:
+            self.jail_agent(propagandas)
 
         # arrest a random active agent and jail her for a random choice of up
         # to JAIL_MAX_TERM steps
-        if actives:
-            jailed = self.random.choice(actives)
-            jailed.jail_time = self.random.randint(0, self.model.max_jail_term)
-            if self.model.movement:
-                self.model.grid.move_agent(self, jailed.pos)
+        elif actives:
+            self.jail_agent(actives)
 
         # otherwise move if applicable to an empty neighbouring cell
         elif self.model.movement and self.empty_cells:
             new_pos = self.random.choice(self.empty_cells)
             self.model.grid.move_agent(self, new_pos)
 
+    # class method for jailing a propaganda/active population agent and moving
+    # to their position if applicable
+    def jail_agent(self, agents):
+        jailed = self.random.choice(agents)
+        jailed.jail_time = self.random.randint(0, self.model.max_jail_term)
+        if self.model.movement:
+            self.model.grid.move_agent(self, jailed.pos)
 
-
-
-class PropagandaAgent(PopulationAgent):
+class PropagandaAgent(Agent):
     '''
     Agents who spread propaganada.
 
@@ -245,34 +265,27 @@ class PropagandaAgent(PopulationAgent):
 
     '''
 
-    @classmethod
-    def _get_val_from_uniform_(cls, low=0, high=1):
-        return random.uniform(low, high)
+    def __init__(self, unique_id, model, influence, exposure_threshold, vision, pos):
 
-    def __init__(self,*args,**kwargs):
-        super(PropagandaAgent,self).__init__(*args,**kwargs)
-
+        super().__init__(unique_id, model)
         self.agent_class = PROPAGANDA_AGENT_CLASS
-
-        self.propaganda_value = PropagandaAgent._get_val_from_uniform_() #Every propaganda agent has different propaganda value
-
-
+        self.influence = influence
+        self.total_influence = 0
+        self.exposure_threshold = exposure_threshold
+        self.visible_to_cops = False 
+        self.jail_time = 0 
+        self.vision = vision
+        self.pos = pos
 
     def step(self):
-        '''
-        Propaganda agent will always be active, if not in jail
-        :return:
-        '''
 
-        #super(PropagandaAgent,self).step()
-
+        # no action for jailed agents
         if self.jail_time:
             self.jail_time -= 1
-            if self.jail_time:
-                self.active = False
+            if not self.jail_time:
+                self.total_influence = 0 #influence is reset when an agent is out of jail
+                self.visible_to_cops = False
             return
-
-        self.active = True #propaganda agent will always be active, if not in jail
 
         # position of neighborhood cells
         self.neighborhood = self.model.grid.get_neighborhood(
@@ -284,31 +297,22 @@ class PropagandaAgent(PopulationAgent):
         self.empty_cells = [
             cell for cell in self.neighborhood if self.model.grid.is_cell_empty(cell)]
 
-        """
-			Get arrest probability based on number of active agents
-			to cop ratio in the neighborhood
-		"""
-
-        cops_in_vision = len(
-            [agent for agent in self.neighbors if agent.agent_class == COP_AGENT_CLASS])
-
-        # agent counts herself as active when estimating arrest probability
-        actives_in_vision = 1
+        # calculate the **NEW** number of citizens that are influenced 
         for agent in self.neighbors:
-            if agent.agent_class in [POPULATION_AGENT_CLASS,
-                                     PROPAGANDA_AGENT_CLASS] and agent.active and not agent.jail_time:
-                actives_in_vision += 1
+            if agent.agent_class in [POPULATION_AGENT_CLASS] and not agent.jail_time and not agent.active:
+                self.total_influence += 1
 
-        # defining arrest probability for each agent
-        # depending on cop-to-active ratio
-        # arrest_prob _constant is defined as 2.3 in the netlogo implementation
-        # a rounding to min integer is implemented as suggested in the netlogo
-        # implementation
-        self.ratio_c_a = int(cops_in_vision / actives_in_vision)
-        self.arrest_probability = (
-                1 - math.exp(-1 * self.model.arrest_prob_constant * self.ratio_c_a))
+        # expose propaganda agent if she has severely influenced the population
+        if self.total_influence > self.exposure_threshold:
+            self.visible_to_cops = True
+        else:
+            self.visible_to_cops = False
 
-        # randomly move to an empty neighborhood cell
+        # move if applicable to an empty neighbouring cell
         if self.model.movement and self.empty_cells:
             new_pos = self.random.choice(self.empty_cells)
             self.model.grid.move_agent(self, new_pos)
+
+
+
+
