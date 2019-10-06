@@ -34,7 +34,7 @@ Changes are in topics of propaganda agent implementation,
 refning the model to propaganda effect and cops interaction to propaganda
 agents. A summary is:
 
-###1.1 Propanda Agents
+### 1.1 Propanda Agents
 In current implementation, propaganda are normal population agents (citizens)
 that follow the normal citizen behaviour (respect the activation rule A to check
 whether they go active or not) and essentially count as citizens themselves.
@@ -48,7 +48,7 @@ not actually citizens (or cops), they do not become active or account as popu-
 lation/cop agents for calculations of other agents. All they do is spread propa-
 ganda to the grid. The theory behind this change is to leave out of our research
 the inter-dynamics of propaganda-population agents (accounting propaganda
-agents as citizens themselves) and simply model the eect of propaganda in the
+agents as citizens themselves) and simply model the effect of propaganda in the
 standard population-cop Epstein system.
 
 Propaganda agents are now dened by the following properties:
@@ -66,21 +66,21 @@ jail them).
 - visible to cops = False. When the above threshold is exceeded, this flag becomes True so cops can see and arrest them.
 
 
-###1.2 Population Agents
+### 1.2 Population Agents
 The citizen activation rule A is now:
         
         A : G' - NR > T                     (1)
 where G' is the new Grievance term, NR is the old Net Risk parameter:
         
-        NR = risk_aversion .prob_of_arrest  (2)
+        NR = risk_aversion.prob_of_arrest  (2)
         
 and T is the active threshold, dynamically set from UI (global parameter). The
 new Grievance is now calculated as:
     
-        G' = (G + w*PE)/1 + w              (3)
+        G' = (G + w*PE)/1 + w              (3)
 with w being a global UI parameter that decides the importance of the pro-
-paganda eect in the model (this is the propaganda_factor parameter in the
-current implementation, now set to :001). The propaganda eect is implemented
+paganda effect in the model (this is the propaganda_factor parameter in the
+current implementation, now set to :001). The propaganda effect is implemented
 as:
 
         PE = s * sum(Influence(PropagandaAgent_i)/N)    (4)
@@ -89,7 +89,7 @@ susceptibility = uniform(0,1)) and N the total number (and not percent-
 age) of propaganda agents currently in the board.
 
 
-###1.3 Cop Agents
+### 1.3 Cop Agents
 Cop agents rule for capturing agents needs to be changes so that rst they
 look for propaganda agents with the visible to cops 
 ag on. If they do, the catch her (or a random selection of them if they are multiple). Otherwise,
