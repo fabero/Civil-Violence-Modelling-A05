@@ -95,7 +95,7 @@ model_params = {
         description="Maximum number of steps that jailed citizens stay in"),
     "propaganda_factor": UserSettableParameter("slider", "Propaganda Factor", 1, 0, 1000,
         description="Importance of propaganda effect in agent Grievance"),
-    "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 5000, 0, 10000,
+    "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 5000, 0, 1000000,
         description="Threshold that propaganda agent's influence must exceed to become epxosed to cops"),
     "movement": UserSettableParameter("checkbox", "Movement", True)
 }
@@ -105,13 +105,16 @@ line_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                           {"Label": "Jailed", "Color": JAIL_COLOR},
                           {"Label": "Active Propaganda Agents", "Color": end_prop}], 100, 270)
 
+influence_chart = ChartModule([{"Label": "Total Influence", "Color": end_prop}], 50, 135)
+grievance_chart = ChartModule([{"Label": "Total Inactive Grievance", "Color": AGENT_QUIET_COLOR}], 50, 135)
+
 pie_chart = PieChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                             {"Label": "Active", "Color": AGENT_REBEL_COLOR},
                             {"Label": "Jailed", "Color": JAIL_COLOR},
                             {"Label": "Active Propaganda Agents", "Color": end_prop}], 200, 500)
 
 canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
-server = ModularServer(CivilViolenceModel, [canvas_element, pie_chart, line_chart],
+server = ModularServer(CivilViolenceModel, [canvas_element, pie_chart, influence_chart, grievance_chart, line_chart],
                        "Epstein Civil Violence Model 1", model_params)
 
 # launch server
