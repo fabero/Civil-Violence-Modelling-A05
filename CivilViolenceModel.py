@@ -87,7 +87,9 @@ class CivilViolenceModel(Model):
             "Quiescent": lambda m: self.count_type_citizens(m, False),
             "Active": lambda m: self.count_type_citizens(m, True),
             "Jailed": lambda m: self.count_jailed(m),
-            "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m)}
+            "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m),
+            "Total Inactive Grievance": lambda m : self.report_total_inactive_grievance(m),   
+            "Total Influence": lambda m : self.report_total_influence(m)}
 
         agent_reporters = {
             "x": lambda a: a.pos[0],
@@ -193,3 +195,25 @@ class CivilViolenceModel(Model):
             if agent.agent_class in [PROPAGANDA_AGENT_CLASS] and not agent.jail_time:
                 count += 1
         return count
+
+    @staticmethod
+    def report_total_influence(model):
+        """
+        Helper method to count total influence of propaganda agents.
+        """
+        total = 0.
+        for agent in model.schedule.agents:
+            if agent.agent_class in [PROPAGANDA_AGENT_CLASS] and not agent.jail_time:
+                total += agent.total_influence
+        return total
+
+    @staticmethod
+    def report_total_inactive_grievance(model):
+        """
+        Helper method to count total grievance of non-jailed, inactive population agents.
+        """
+        total = 0.
+        for agent in model.schedule.agents:
+            if agent.agent_class in [POPULATION_AGENT_CLASS] and not agent.active and not agent.jail_time:
+                total += agent.grievance
+        return total 
