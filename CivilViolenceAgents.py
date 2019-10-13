@@ -67,6 +67,7 @@ class PopulationAgent(Agent):
         self.hardship = hardship
         self.legitimacy = legitimacy
         self.grievance = self.hardship * (1 - self.legitimacy)
+        self.net_risk = 0 
         self.active = False
         self.risk_aversion = risk_aversion
         self.threshold = threshold
@@ -100,6 +101,23 @@ class PopulationAgent(Agent):
         propaganda_effect = self.susceptibility * propaganda_in_vision #/ self.model.count_propaganda_agents(self.model)
         return propaganda_effect
 
+    def search_neighborhood(self):
+        """
+            Get information of the neighborhood.
+            Get all the neighbors info and empty cells in neighborhood
+        """
+
+        # position of neighborhood cells
+        self.neighborhood = self.model.grid.get_neighborhood(
+            self.pos, moore=False, radius=self.vision)
+        # attributes of all the neighboars
+        self.neighbors = self.model.grid.get_cell_list_contents(
+            self.neighborhood)
+        # empty neighborhood cells
+        self.empty_cells = [
+            cell for cell in self.neighborhood if self.model.grid.is_cell_empty(cell)]
+
+
     def step(self):
         # The population agent's movement and activenes rules A and M from the
         # paper
@@ -115,20 +133,7 @@ class PopulationAgent(Agent):
                 self.active = False
             return
 
-        """
-            Get information of the neighborhood.
-            Get all the neighbors info and empty cells in neighborhood
-        """
-
-        # position of neighborhood cells
-        self.neighborhood = self.model.grid.get_neighborhood(
-            self.pos, moore=False, radius=self.vision)
-        # attributes of all the neighboars
-        self.neighbors = self.model.grid.get_cell_list_contents(
-            self.neighborhood)
-        # empty neighborhood cells
-        self.empty_cells = [
-            cell for cell in self.neighborhood if self.model.grid.is_cell_empty(cell)]
+        self.search_neighborhood()
 
         """
             Get arrest probability based on number of active agents
