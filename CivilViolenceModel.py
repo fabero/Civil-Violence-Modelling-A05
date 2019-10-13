@@ -88,7 +88,8 @@ class CivilViolenceModel(Model):
             "Active": lambda m: self.count_type_citizens(m, True),
             "Jailed": lambda m: self.count_jailed(m),
             "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m),
-            "Total Inactive Grievance": lambda m : self.report_total_inactive_grievance(m),   
+            "Total Inactive Grievance": lambda m : self.report_total_inactive_grievance(m), 
+            "Total Inactive Net Risk":  lambda m : self.report_total_inactive_net_risk(m),  
             "Total Influence": lambda m : self.report_total_influence(m)}
 
         agent_reporters = {
@@ -216,4 +217,15 @@ class CivilViolenceModel(Model):
         for agent in model.schedule.agents:
             if agent.agent_class in [POPULATION_AGENT_CLASS] and not agent.active and not agent.jail_time:
                 total += agent.grievance
+        return total 
+
+    @staticmethod
+    def report_total_inactive_net_risk(model):
+        """
+        Helper method to count total net risk of non jailed, inactive population agents.
+        """
+        total = 0.
+        for agent in model.schedule.agents:
+            if agent.agent_class in [POPULATION_AGENT_CLASS] and not agent.active and not agent.jail_time:
+                total += agent.net_risk 
         return total 
