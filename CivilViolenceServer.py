@@ -106,7 +106,8 @@ line_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                           {"Label": "Active Propaganda Agents", "Color": end_prop}], 100, 270)
 
 influence_chart = ChartModule([{"Label": "Total Influence", "Color": end_prop}], 50, 135)
-grievance_chart = ChartModule([{"Label": "Total Inactive Grievance", "Color": AGENT_QUIET_COLOR}], 50, 135)
+grievance_chart = ChartModule([{"Label": "Total Inactive Grievance", "Color": AGENT_QUIET_COLOR},
+                               {"Label": "Total Inactive Net Risk", "Color": COP_COLOR}], 50, 135)
 
 pie_chart = PieChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                             {"Label": "Active", "Color": AGENT_REBEL_COLOR},
