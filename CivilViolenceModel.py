@@ -51,13 +51,13 @@ class CivilViolenceModel(Model):
             cop_vision=7,
             legitimacy=82,
             max_jail_term=30,
-            active_threshold=10,
+            active_threshold=4,
             arrest_prob_constant=2.3,
             movement=True,
             max_iters=1000,
             propaganda_agent_density=2,
             propaganda_factor=1,
-            exposure_threshold=5000,
+            exposure_threshold=10,
     ):
         super().__init__()
         self.height = height
@@ -87,7 +87,11 @@ class CivilViolenceModel(Model):
             "Quiescent": lambda m: self.count_type_citizens(m, False),
             "Active": lambda m: self.count_type_citizens(m, True),
             "Jailed": lambda m: self.count_jailed(m),
-            "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m)}
+            "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m),
+            "Total Inactive Grievance": lambda m : self.report_total_inactive_grievance(m), 
+            "Total Inactive Net Risk":  lambda m : self.report_total_inactive_net_risk(m),  
+            "Total Influence": lambda m : self.report_total_influence(m),
+            "Ripeness Index": lambda m: self.report_ripeness_index(m)}
 
         agent_reporters = {
             "x": lambda a: a.pos[0],
@@ -193,3 +197,59 @@ class CivilViolenceModel(Model):
             if agent.agent_class in [PROPAGANDA_AGENT_CLASS] and not agent.jail_time:
                 count += 1
         return count
+
+    @staticmethod
+    def report_total_influence(model):
+        """
+        Helper method to count total influence of propaganda agents.
+        """
+        total = 0.
+        for agent in model.schedule.agents:
+            if agent.agent_class in [PROPAGANDA_AGENT_CLASS] and not agent.jail_time:
+                total += agent.total_influence
+        return total
+
+    @staticmethod
+    def report_total_inactive_grievance(model):
+        """
+        Helper method to count total grievance of non-jailed, inactive population agents.
+        """
+        total = 0.
+        average = 0.
+        for agent in model.schedule.agents:
+            if agent.agent_class in [POPULATION_AGENT_CLASS] and not agent.active and not agent.jail_time:
+                total += agent.grievance       
+        return total 
+
+    @staticmethod
+    def report_total_inactive_net_risk(model):
+        """
+        Helper method to count total net risk of non jailed, inactive population agents.
+        """
+        total = 0.
+        for agent in model.schedule.agents:
+            if agent.agent_class in [POPULATION_AGENT_CLASS] and not agent.active and not agent.jail_time:
+                total += agent.net_risk 
+        return total 
+
+    @staticmethod
+    def report_ripeness_index(model):
+        """
+        Helper method to count ripeness index, as defined in Epsteins paper:
+        RI = E[G] * Q / E[R], where:
+        E[G]: Expected value for total grievance of all non-jailed agents
+        E[R]: Expected value for total risk aversion of all non-jailed agents
+        """
+        count, E_R, E_G = 0., 0., 0.
+        for agent in model.schedule.agents:
+            if agent.agent_class in [POPULATION_AGENT_CLASS] and not agent.jail_time:
+                count += 1
+                E_R += agent.risk_aversion 
+                E_G += agent.grievance
+        E_R /= count 
+        E_G /= count 
+
+        # number of inactive population agents
+        Q = model.count_type_citizens(model, count_actives=False)
+
+        return float(E_G) * Q / E_R
