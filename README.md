@@ -25,7 +25,7 @@ Baseline mplementation is based on the given examples of the [mesa framework](ht
 # Alpha Version: Implementing propaganda agents
 For our current experimental setup, the 70% of population is divided in 60% citizens - 10% propaganda agents. Propaganda agents spread propaganda to their local vision with a uniformly distributed influence, which affects the desicion of population agents to rebel by introfucing a new factor to their grievance variable, called Propaganda Effect (PE). By properly adjusting the model parameters, we see the effect of propaganda agents in the system's equilibria in the figures below: 
 - Baseline Model (Epstein). The system equilibria described in Epstein's paper.
-    ![Screenshot](https://github.com/fabero/Civil-Violence-Modelling-A05/blob/giorgos/figures/Baseline.png)
+    ![Screenshot](https://github.com/fabero/Civil-Violence-Modelling-A05/blob/master/figures/Baseline.png)
 - Alpha Version Model. We see the effect that propaganda agents have in the simulation, namely: a) Increase in rebellion outburst, as well as time in it (the slope of the red curves), b) Increase in rebellion outburst frequency, as witnessed by viewing the spikes in the x-axis, c) Finally converge in a state where most citizens are steadily in jail and so no more rebellions can outburst.
     ![Screenshot](https://github.com/fabero/Civil-Violence-Modelling-A05/blob/giorgos/figures/Selection_004.jpg)
 
