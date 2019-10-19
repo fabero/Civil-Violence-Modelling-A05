@@ -15,6 +15,15 @@ JAIL_COLOR = "#757575"
 start_prop = "#FFEBE3"
 end_prop = "#FF4500"
 
+# start and end hex values for grievance of a population agent 
+start_griev = "#6658CF" 
+end_griev =  "#66FFB2"
+
+# we generate an array of hex values in between stsart and end hex values
+# in order to represent the grievance of the agents with an array of 
+# values in the grid 
+grad_grievance = linear_gradient(start_griev, end_griev, n=500)['hex']
+
 # we generate an array of hex values in between start and end hex values
 # in order to represent agents with an array of propaganda values
 # in the grid
@@ -28,6 +37,40 @@ end_suscep = "#007FFA"
 # in order to represent agents with an array of susceptibility values
 # in the grid
 grad_suceptibility = linear_gradient(start_suscep, end_suscep, n=100)['hex']
+
+def grievance_portrayal(agent):
+    if agent is None:
+        return 
+
+    portrayal = {"Shape": "rect",
+                 "x": agent.pos[0], "y": agent.pos[1],
+                 "Filled": "true"}
+
+    if isinstance(agent, PropagandaAgent):
+        propaganda_value = int(agent.influence * 100)
+        portrayal['Color'] = grad_propaganda[propaganda_value]
+        portrayal['w'] = 1
+        portrayal['h'] = 1
+        portrayal['Layer'] = 0
+
+    elif isinstance(agent, PopulationAgent):
+        '''
+        Visualize the Grievance of the agents 
+        '''
+        grievance_value = int(agent.grievance * 100)
+        color = grad_grievance[grievance_value]
+        portrayal['Color'] = color 
+        portrayal['w'] = .75
+        portrayal['h'] = .75
+        portrayal['Layer'] = 1
+
+    elif isinstance(agent, CopAgent):
+        portrayal['Color'] = COP_COLOR
+        portrayal['w'] = 1
+        portrayal['h'] = 1
+        portrayal['Layer'] = 2 
+
+    return portrayal
 
 def citizen_cop_portrayal(agent):
     if agent is None:
@@ -95,27 +138,33 @@ model_params = {
         description="Maximum number of steps that jailed citizens stay in"),
     "propaganda_factor": UserSettableParameter("slider", "Propaganda Factor", 1, 0, 1000,
         description="Importance of propaganda effect in agent Grievance"),
-    "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 5000, 0, 1000000,
+    "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 10, 0, 1000,
         description="Threshold that propaganda agent's influence must exceed to become epxosed to cops"),
     "movement": UserSettableParameter("checkbox", "Movement", True)
 }
 
-line_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
+agents_state_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                           {"Label": "Active", "Color": AGENT_REBEL_COLOR},
                           {"Label": "Jailed", "Color": JAIL_COLOR},
                           {"Label": "Active Propaganda Agents", "Color": end_prop}], 100, 270)
 
-influence_chart = ChartModule([{"Label": "Total Influence", "Color": end_prop}], 50, 135)
+
 grievance_chart = ChartModule([{"Label": "Total Inactive Grievance", "Color": AGENT_QUIET_COLOR},
-                               {"Label": "Total Inactive Net Risk", "Color": COP_COLOR}], 50, 135)
+                               {"Label": "Total Inactive Net Risk", "Color": COP_COLOR},
+                               {"Label": "Total Influence", "Color": end_prop}], 50, 135)
 
 pie_chart = PieChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                             {"Label": "Active", "Color": AGENT_REBEL_COLOR},
                             {"Label": "Jailed", "Color": JAIL_COLOR},
                             {"Label": "Active Propaganda Agents", "Color": end_prop}], 200, 500)
 
+ripeness_chart = ChartModule([{"Label": "Ripeness Index", "Color": end_griev}], 200, 500)
+
 canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
-server = ModularServer(CivilViolenceModel, [canvas_element, pie_chart, influence_chart, grievance_chart, line_chart],
+
+grievance_element = CanvasGrid(grievance_portrayal, 40, 40, 500, 500)
+
+server = ModularServer(CivilViolenceModel, [canvas_element, grievance_element, pie_chart, ripeness_chart, grievance_chart, agents_state_chart],
                        "Epstein Civil Violence Model 1", model_params)
 
 # launch server

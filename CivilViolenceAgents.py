@@ -185,8 +185,8 @@ class PopulationAgent(Agent):
     '''
     def cal_change_in_grievance_due_to_propaganda(self):
         #return a weighted average of Epstein's Grievance with the modeled propaganda effect defined dynamically
-        grievance = (1 * self.grievance + self.propaganda_factor * self.cal_propaganda_effect()) / (1 + self.propaganda_factor)
-        return grievance
+        self.grievance += self.propaganda_factor * self.cal_propaganda_effect() / (1 + self.propaganda_factor)
+        return self.grievance
 
 
 class CopAgent(Agent):
@@ -260,9 +260,10 @@ class CopAgent(Agent):
         jailed.jail_time = self.random.randint(1, self.model.max_jail_term)
         # reduce the influence of the propaganda agent for when they become free
         if jailed.agent_class in [PROPAGANDA_AGENT_CLASS]:
-            print('jailed propaganda agent,')
+            #print('jailed propaganda agent,')
             jailed.total_influence /= jailed.jail_time * FACTOR
-            print('with new total influence after release:{:.4f}'.format(jailed.total_influence)) 
+            #print('with new total influence after release:{:.4f}'.format(jailed.total_influence)) 
+            
         if self.model.movement:
             self.model.grid.move_agent(self, jailed.pos)
 
@@ -305,10 +306,12 @@ class PropagandaAgent(Agent):
         self.empty_cells = [
             cell for cell in self.neighborhood if self.model.grid.is_cell_empty(cell)]
 
+        quiets_in_vision = [agent for agent in self.neighbors if agent.agent_class == POPULATION_AGENT_CLASS and not agent.active and not agent.jail_time]
+
         # calculate the **NEW** number of citizens that are influenced 
         for agent in self.neighbors:
             if agent.agent_class in [POPULATION_AGENT_CLASS] and not agent.jail_time and not agent.active:
-                self.total_influence += FACTOR * self.influence * agent.susceptibility
+                self.total_influence += FACTOR * self.influence * agent.susceptibility / len(quiets_in_vision)
 
         # expose propaganda agent if she has severely influenced the population
         if self.total_influence > self.exposure_threshold:
