@@ -263,6 +263,7 @@ class CopAgent(Agent):
             #print('jailed propaganda agent,')
             jailed.total_influence /= jailed.jail_time * FACTOR
             #print('with new total influence after release:{:.4f}'.format(jailed.total_influence)) 
+            
         if self.model.movement:
             self.model.grid.move_agent(self, jailed.pos)
 

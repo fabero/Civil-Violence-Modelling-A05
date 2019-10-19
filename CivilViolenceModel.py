@@ -90,6 +90,7 @@ class CivilViolenceModel(Model):
             "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m),
             "Total Inactive Grievance": lambda m : self.report_total_inactive_grievance(m), 
             "Total Inactive Net Risk":  lambda m : self.report_total_inactive_net_risk(m),  
+
             "Total Influence": lambda m : self.report_total_influence(m),
             "Ripeness Index": lambda m: self.report_ripeness_index(m)}
 

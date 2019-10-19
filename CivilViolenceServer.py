@@ -148,6 +148,7 @@ agents_state_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_CO
                           {"Label": "Jailed", "Color": JAIL_COLOR},
                           {"Label": "Active Propaganda Agents", "Color": end_prop}], 100, 270)
 
+
 grievance_chart = ChartModule([{"Label": "Total Inactive Grievance", "Color": AGENT_QUIET_COLOR},
                                {"Label": "Total Inactive Net Risk", "Color": COP_COLOR},
                                {"Label": "Total Influence", "Color": end_prop}], 50, 135)
@@ -160,6 +161,7 @@ pie_chart = PieChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
 ripeness_chart = ChartModule([{"Label": "Ripeness Index", "Color": end_griev}], 200, 500)
 
 canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
+
 grievance_element = CanvasGrid(grievance_portrayal, 40, 40, 500, 500)
 
 server = ModularServer(CivilViolenceModel, [canvas_element, grievance_element, pie_chart, ripeness_chart, grievance_chart, agents_state_chart],
