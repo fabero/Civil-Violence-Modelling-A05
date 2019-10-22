@@ -10,6 +10,7 @@ COP_COLOR = "#000000"
 AGENT_QUIET_COLOR = "#0066CC"
 AGENT_REBEL_COLOR = "#CC0000"
 JAIL_COLOR = "#757575"
+PROPAGANDA_AGENT_COLOR_OUT_JAIL = "#FF4500"
 
 # start and end hex values for propaganda of an agent
 start_prop = "#FFEBE3"
@@ -47,8 +48,8 @@ def grievance_portrayal(agent):
                  "Filled": "true"}
 
     if isinstance(agent, PropagandaAgent):
-        propaganda_value = int(agent.influence * 100)
-        portrayal['Color'] = grad_propaganda[propaganda_value]
+        #propaganda_value = int(agent.influence * 100)
+        portrayal['Color'] = PROPAGANDA_AGENT_COLOR_OUT_JAIL#grad_propaganda[propaganda_value]
         portrayal['w'] = 1
         portrayal['h'] = 1
         portrayal['Layer'] = 0
@@ -88,10 +89,10 @@ def citizen_cop_portrayal(agent):
         # assigning a color from gradient of colors in grad_propaganda list
         # depending on the intensity propaganda value of the agent
 
-        propaganda_value = int(agent.influence * 100)
+        #propaganda_value = int(agent.influence * 100)
 
-        color = JAIL_COLOR if agent.jail_time else grad_propaganda[propaganda_value]
-        # color = PROPAGANDA_AGENT_COLOR_JAIL if agent.jail_time else PROPAGANDA_AGENT_COLOR_OUT_JAIL
+        #color = JAIL_COLOR if agent.jail_time else grad_propaganda[propaganda_value]
+        color = JAIL_COLOR if agent.jail_time else PROPAGANDA_AGENT_COLOR_OUT_JAIL
         portrayal['Shape'] = 'rect'
         portrayal["Color"] = color
         portrayal["w"] = 0.8
@@ -138,8 +139,10 @@ model_params = {
         description="Maximum number of steps that jailed citizens stay in"),
     "propaganda_factor": UserSettableParameter("slider", "Propaganda Factor", 1, 0, 1000,
         description="Importance of propaganda effect in agent Grievance"),
-    "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 10, 0, 1000,
-        description="Threshold that propaganda agent's influence must exceed to become epxosed to cops"),
+    # "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 10, 0, 1000,
+    #     description="Threshold that propaganda agent's influence must exceed to become epxosed to cops"),
+    "repetition_threshold": UserSettableParameter("slider", "Repetition Threshold",100, 0, 10000,
+        description="Untill how many repetitions it becomes propaganda"),
     "movement": UserSettableParameter("checkbox", "Movement", True)
 }
 

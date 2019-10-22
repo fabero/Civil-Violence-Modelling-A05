@@ -36,9 +36,6 @@ class CivilViolenceModel(Model):
 
         propaganda_agent_density: % of propaganda agent
 
-        propaganda_allowed: True if we are allowing propaganda
-
-
     """
 
     def __init__(
@@ -57,7 +54,7 @@ class CivilViolenceModel(Model):
             max_iters=1000,
             propaganda_agent_density=2,
             propaganda_factor=1,
-            exposure_threshold=10,
+            repetition_threshold=150,
     ):
         super().__init__()
         self.height = height
@@ -79,8 +76,8 @@ class CivilViolenceModel(Model):
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=True)
 
-        self.propaganda_factor = propaganda_factor / 1000
-        self.exposure_threshold = exposure_threshold
+        self.propaganda_factor = propaganda_factor #For this strategy we dont need to divide propaganda factor by 1000
+        self.repetition_threshold = repetition_threshold
 
         # initiate data collectors for agent state feedback
         model_reporters = {
@@ -90,7 +87,6 @@ class CivilViolenceModel(Model):
             "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m),
             "Total Inactive Grievance": lambda m : self.report_total_inactive_grievance(m), 
             "Total Inactive Net Risk":  lambda m : self.report_total_inactive_net_risk(m),  
-            "Total Influence": lambda m : self.report_total_influence(m),
             "Ripeness Index": lambda m: self.report_ripeness_index(m)}
 
         agent_reporters = {
@@ -114,8 +110,8 @@ class CivilViolenceModel(Model):
         for (contents, x, y) in self.grid.coord_iter():
             if self.random.random() < self.propaganda_agent_density:
                 agent = PropagandaAgent(unique_id, self,
-                                          influence = self.random.random(),
-                                          exposure_threshold = self.exposure_threshold,
+                                          #influence = self.random.random(),
+                                          #exposure_threshold = self.exposure_threshold,
                                           vision=self.citizen_vision,
                                           pos=(x,y))
                 unique_id += 1
@@ -143,7 +139,8 @@ class CivilViolenceModel(Model):
                                           susceptibility=self.random.random(),
                                           propaganda_factor=self.propaganda_factor,
                                           vision=self.citizen_vision,
-                                          pos=(x, y))
+                                          pos=(x, y),
+                                          repetition_threshold=self.repetition_threshold)
                 unique_id += 1
                 self.grid[y][x] = citizen
                 self.schedule.add(citizen)
