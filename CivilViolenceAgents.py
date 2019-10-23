@@ -50,7 +50,7 @@ class PopulationAgent(Agent):
             propaganda_factor,
             vision,
             pos,
-            repetition_threshold,
+            propaganda_exposure_threshold,
     ):
         '''
         Initiate a PopulationAgent
@@ -87,8 +87,8 @@ class PopulationAgent(Agent):
         self.susceptibility = susceptibility
         self.propaganda_factor = propaganda_factor
 
-        self.repetition_count=0
-        self.repetition_threshold = repetition_threshold
+        self.propaganda_exposure_count = 0
+        self.propaganda_exposure_threshold = propaganda_exposure_threshold
 
         self.propaganda_grievance = stretched_sigmoid(self.propaganda_factor,self.grievance + self.propaganda_factor*self.susceptibility)
 
@@ -109,6 +109,32 @@ class PopulationAgent(Agent):
         # empty neighborhood cells
         self.empty_cells = [
             cell for cell in self.neighborhood if self.model.grid.is_cell_empty(cell)]
+
+    def induced_nationalism_strategy(self, net_risk, default=True):
+        """
+        In this strategy, we assume, if a population agent has seen propaganda
+        for a certain count then the population agent develops a feeling of nationalism.
+        This feeling in effect, reduces the risk aversion for the population agent
+        and motivates the agent to take part in the rebellion. Or to put it differently
+        this feeling on nationalism tweaks an agent's ability to gauge risk and as a
+        consequence the agent underestimates risk which results in a lower risk aversion
+        value.
+
+        CASE DEFAULT: we have a propaganda_exposure_threshold set to 100. That is,
+        a population agent having seen 100 propaganda agents develops a feeling of nationalism.
+        The risk aversion decaying factor is 1/propaganda_exposure_count.
+
+        CASE ONE: the risk aversion decaying factor is np.exp(-propaganda_exposure_count).
+        This in effect exponentially reduces risk aversion given propaganda_exposure_count.
+
+        :param default: True or False: if True use default case
+        :return: risk_aversion decay factor
+        """
+
+        # threshold for propaganda count exposure above which agents develops a
+        # feeling of nationalism
+        print('resultant netrisk:', net_risk - 0.1)
+        return net_risk - 0.1
 
 
     def step(self):
@@ -140,14 +166,10 @@ class PopulationAgent(Agent):
         actives_in_vision = 1 + len(
             [agent for agent in self.neighbors if agent.agent_class == POPULATION_AGENT_CLASS and agent.active and not agent.jail_time])
 
-        propagandas_in_vision = len(
-            [agent for agent in self.neighbors if
-             agent.agent_class == PROPAGANDA_AGENT_CLASS and not agent.jail_time])
+        self.propaganda_exposure_count += len([agent for agent in self.neighbors
+                                               if agent.agent_class == PROPAGANDA_AGENT_CLASS and not agent.jail_time])
 
-        if propagandas_in_vision > 1:
-            self.repetition_count += 1
-
-
+        print('propaganda exposure count: ', self.propaganda_exposure_count)
 
         # defining arrest probability for each agent
         # depending on cop-to-active ratio
@@ -165,6 +187,10 @@ class PopulationAgent(Agent):
         #First update grievance
         self.grievance = self.cal_change_in_grievance_due_to_propaganda()
         self.net_risk = self.risk_aversion * self.arrest_probability
+
+        if self.propaganda_exposure_count == self.propaganda_exposure_threshold:
+            self.net_risk = self.induced_nationalism_strategy(self.net_risk)
+
         thresh_bool = (self.grievance - self.net_risk) > self.threshold
 
         # simple state transition rule A for population agent
@@ -186,9 +212,8 @@ class PopulationAgent(Agent):
     This function will update grievance value due to propaganda
     '''
     def cal_change_in_grievance_due_to_propaganda(self):
-        if self.repetition_count > self.repetition_threshold:
-            self.grievance = self.propaganda_grievance
-            print(self.unique_id,"influenced by propaganda",self.grievance)
+        #return a weighted average of Epstein's Grievance with the modeled propaganda effect defined dynamically
+        self.grievance += self.propaganda_factor * self.cal_propaganda_effect() / (1 + self.propaganda_factor)
         return self.grievance
 
 

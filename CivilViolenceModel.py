@@ -54,7 +54,7 @@ class CivilViolenceModel(Model):
             max_iters=1000,
             propaganda_agent_density=2,
             propaganda_factor=1,
-            repetition_threshold=150,
+            propaganda_exposure_threshold=100,
     ):
         super().__init__()
         self.height = height
@@ -77,7 +77,7 @@ class CivilViolenceModel(Model):
         self.grid = Grid(height, width, torus=True)
 
         self.propaganda_factor = propaganda_factor #For this strategy we dont need to divide propaganda factor by 1000
-        self.repetition_threshold = repetition_threshold
+        self.propaganda_exposure_threshold = propaganda_exposure_threshold
 
         # initiate data collectors for agent state feedback
         model_reporters = {
@@ -140,7 +140,7 @@ class CivilViolenceModel(Model):
                                           propaganda_factor=self.propaganda_factor,
                                           vision=self.citizen_vision,
                                           pos=(x, y),
-                                          repetition_threshold=self.repetition_threshold)
+                                          propaganda_exposure_threshold=self.propaganda_exposure_threshold)
                 unique_id += 1
                 self.grid[y][x] = citizen
                 self.schedule.add(citizen)
