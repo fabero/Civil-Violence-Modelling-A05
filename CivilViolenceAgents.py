@@ -12,7 +12,6 @@ def stretched_sigmoid(c,x):
 
 
 
-
 class PopulationAgent(Agent):
     '''
     An agent from the population distribution, can become active and be jailed
@@ -54,7 +53,6 @@ class PopulationAgent(Agent):
     ):
         '''
         Initiate a PopulationAgent
-
         Args:
         unique_id: a unique id
         hardship: Perceived hardship (e.g economic privation). Drawn from U(0,1)
@@ -75,7 +73,7 @@ class PopulationAgent(Agent):
         self.hardship = hardship
         self.legitimacy = legitimacy
         self.grievance = self.hardship * (1 - self.legitimacy)
-        self.net_risk = 0 
+        self.net_risk = 0
         self.active = False
         self.risk_aversion = risk_aversion
         self.threshold = threshold
@@ -92,7 +90,11 @@ class PopulationAgent(Agent):
 
         self.propaganda_grievance = stretched_sigmoid(self.propaganda_factor,self.grievance + self.propaganda_factor*self.susceptibility)
 
-
+    def cal_change_in_grievance_due_to_propaganda(self):
+        if self.repetition_count > self.repetition_threshold:
+            self.grievance = self.propaganda_grievance
+            print(self.unique_id,"influenced by propaganda",self.grievance)
+        return self.grievance
 
     def search_neighborhood(self):
         """
@@ -110,7 +112,7 @@ class PopulationAgent(Agent):
         self.empty_cells = [
             cell for cell in self.neighborhood if self.model.grid.is_cell_empty(cell)]
 
-    def induced_nationalism_strategy(self, net_risk, default=True):
+    def induced_nationalism_strategy(self, net_risk):
         """
         In this strategy, we assume, if a population agent has seen propaganda
         for a certain count then the population agent develops a feeling of nationalism.
@@ -133,9 +135,8 @@ class PopulationAgent(Agent):
 
         # threshold for propaganda count exposure above which agents develops a
         # feeling of nationalism
-        print('resultant netrisk:', net_risk - 0.1)
-        return net_risk - 0.1
-
+        print('resultant netrisk:', net_risk/4.0)
+        return net_risk/4.0
 
     def step(self):
         # The population agent's movement and activenes rules A and M from the
@@ -164,7 +165,8 @@ class PopulationAgent(Agent):
 
         # agent counts herself as active when estimating arrest probability
         actives_in_vision = 1 + len(
-            [agent for agent in self.neighbors if agent.agent_class == POPULATION_AGENT_CLASS and agent.active and not agent.jail_time])
+            [agent for agent in self.neighbors if
+             agent.agent_class == POPULATION_AGENT_CLASS and agent.active and not agent.jail_time])
 
         self.propaganda_exposure_count += len([agent for agent in self.neighbors
                                                if agent.agent_class == PROPAGANDA_AGENT_CLASS and not agent.jail_time])
@@ -185,11 +187,12 @@ class PopulationAgent(Agent):
         # is greater than threshold value which is defined as 0.1 in net logo
         # implementation
         #First update grievance
-        self.grievance = self.cal_change_in_grievance_due_to_propaganda()
+        self.grievance = self.grievance
         self.net_risk = self.risk_aversion * self.arrest_probability
 
         if self.propaganda_exposure_count == self.propaganda_exposure_threshold:
             self.net_risk = self.induced_nationalism_strategy(self.net_risk)
+            print('influenced by nationalism, ready to rebel more!', self.net_risk)
 
         thresh_bool = (self.grievance - self.net_risk) > self.threshold
 
@@ -208,20 +211,11 @@ class PopulationAgent(Agent):
             new_pos = self.random.choice(self.empty_cells)
             self.model.grid.move_agent(self, new_pos)
 
-    '''
-    This function will update grievance value due to propaganda
-    '''
-    def cal_change_in_grievance_due_to_propaganda(self):
-        #return a weighted average of Epstein's Grievance with the modeled propaganda effect defined dynamically
-        self.grievance += self.propaganda_factor * self.cal_propaganda_effect() / (1 + self.propaganda_factor)
-        return self.grievance
-
 
 class CopAgent(Agent):
     """
     An agent that can arrest PopulationAgents.
     Movement Rule: Arrest an active agent in local vision. Move to her position
-
     Attributes:
         unique_id: a unique id
         vision: number of patches in all 4 directions inside cop's inspection.
@@ -292,9 +286,7 @@ class CopAgent(Agent):
 class PropagandaAgent(Agent):
     '''
     Agents who spread propaganada.
-
     Special Attributes:
-
     '''
 
     def __init__(self, unique_id, model, vision, pos):
