@@ -116,7 +116,7 @@ class PopulationAgent(Agent):
         """
         In this strategy, we assume, if a population agent has seen propaganda
         for a certain count then the population agent develops a feeling of nationalism.
-        This feeling in effect, reduces the risk aversion for the population agent
+        This feeling in effect, reduces the net risk for the population agent
         and motivates the agent to take part in the rebellion. Or to put it differently
         this feeling on nationalism tweaks an agent's ability to gauge risk and as a
         consequence the agent underestimates risk which results in a lower risk aversion
@@ -192,6 +192,7 @@ class PopulationAgent(Agent):
 
         if self.propaganda_exposure_count == self.propaganda_exposure_threshold:
             self.net_risk = self.induced_nationalism_strategy(self.net_risk)
+            self.propaganda_exposure_count = 0
             print('influenced by nationalism, ready to rebel more!', self.net_risk)
 
         thresh_bool = (self.grievance - self.net_risk) > self.threshold
