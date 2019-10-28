@@ -6,9 +6,13 @@ from settings import PROPAGANDA_AGENT_CLASS,POPULATION_AGENT_CLASS,COP_AGENT_CLA
 
 FACTOR = 1
 
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
+
 def stretched_sigmoid(c,x):
     x = ((12/(c+1))*x ) - 6
-    return 1 / (1 + math.exp(-x))
+    return sigmoid(x)
 
 
 
@@ -50,7 +54,6 @@ class PopulationAgent(Agent):
             propaganda_factor,
             vision,
             pos,
-            repetition_threshold,
     ):
         '''
         Initiate a PopulationAgent
@@ -87,10 +90,10 @@ class PopulationAgent(Agent):
         self.susceptibility = susceptibility
         self.propaganda_factor = propaganda_factor
 
-        self.repetition_count=0
-        self.repetition_threshold = repetition_threshold
-
-        self.propaganda_grievance = stretched_sigmoid(self.propaganda_factor,self.grievance + self.propaganda_factor*self.susceptibility)
+        # self.repetition_count=0
+        # self.repetition_threshold = repetition_threshold
+		#
+        # self.propaganda_grievance = stretched_sigmoid(self.propaganda_factor,self.grievance + self.propaganda_factor*self.susceptibility)
 
 
 
@@ -144,9 +147,6 @@ class PopulationAgent(Agent):
             [agent for agent in self.neighbors if
              agent.agent_class == PROPAGANDA_AGENT_CLASS and not agent.jail_time])
 
-        if propagandas_in_vision > 1:
-            self.repetition_count += 1
-
 
 
         # defining arrest probability for each agent
@@ -155,6 +155,17 @@ class PopulationAgent(Agent):
         # a rounding to min integer is implemented as suggested in the netlogo
         # implementation
         self.ratio_c_a = int(cops_in_vision / actives_in_vision)
+        ##In disinformation we only need to change net_risk, disinformation is less number of cops so propaganda agent takes more risk.
+        ##Formula = ratio_c_a*(1- sigmoid(propaganda factor* propagandas_in_vision/(1+propaganda factor* propagandas_in_vision))
+        print("Old c_a:",self.ratio_c_a)
+        #effect = (1 - sigmoid(self.propaganda_factor *propagandas_in_vision/(1+ self.propaganda_factor * propagandas_in_vision)))
+        if self.propaganda_factor == 0 or propagandas_in_vision == 0:
+            effect = 1
+        else:
+            effect = (self.propaganda_factor/(1+self.propaganda_factor)) * sigmoid((self.susceptibility*propagandas_in_vision/(1+ propagandas_in_vision)))
+        print("Effect:",effect)
+        self.ratio_c_a = self.ratio_c_a * effect
+        print("New c_a:", self.ratio_c_a)
         self.arrest_probability = (
             1 - math.exp(-1 * self.model.arrest_prob_constant * self.ratio_c_a))
 
@@ -163,7 +174,9 @@ class PopulationAgent(Agent):
         # is greater than threshold value which is defined as 0.1 in net logo
         # implementation
         #First update grievance
-        self.grievance = self.cal_change_in_grievance_due_to_propaganda()
+
+
+        #self.grievance = self.cal_change_in_grievance_due_to_propaganda()
         self.net_risk = self.risk_aversion * self.arrest_probability
         thresh_bool = (self.grievance - self.net_risk) > self.threshold
 
@@ -182,14 +195,14 @@ class PopulationAgent(Agent):
             new_pos = self.random.choice(self.empty_cells)
             self.model.grid.move_agent(self, new_pos)
 
-    '''
-    This function will update grievance value due to propaganda
-    '''
-    def cal_change_in_grievance_due_to_propaganda(self):
-        if self.repetition_count > self.repetition_threshold:
-            self.grievance = self.propaganda_grievance
-            print(self.unique_id,"influenced by propaganda",self.grievance)
-        return self.grievance
+    # '''
+    # This function will update grievance value due to propaganda
+    # '''
+    # def cal_change_in_grievance_due_to_propaganda(self):
+    #     if self.repetition_count > self.repetition_threshold:
+    #         self.grievance = self.propaganda_grievance
+    #         print(self.unique_id,"influenced by propaganda",self.grievance)
+    #     return self.grievance
 
 
 class CopAgent(Agent):

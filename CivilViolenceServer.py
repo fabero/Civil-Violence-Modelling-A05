@@ -141,8 +141,8 @@ model_params = {
         description="Importance of propaganda effect in agent Grievance"),
     # "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 10, 0, 1000,
     #     description="Threshold that propaganda agent's influence must exceed to become epxosed to cops"),
-    "repetition_threshold": UserSettableParameter("slider", "Repetition Threshold",100, 0, 10000,
-        description="Untill how many repetitions it becomes propaganda"),
+    # "repetition_threshold": UserSettableParameter("slider", "Repetition Threshold",100, 0, 10000,
+    #     description="Untill how many repetitions it becomes propaganda"),
     "movement": UserSettableParameter("checkbox", "Movement", True)
 }
 
