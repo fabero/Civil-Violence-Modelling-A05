@@ -58,6 +58,7 @@ class CivilViolenceModel(Model):
             propaganda_agent_density=2,
             propaganda_factor=1,
             exposure_threshold=10,
+            martyrdom_range=8,
     ):
         super().__init__()
         self.height = height
@@ -81,6 +82,7 @@ class CivilViolenceModel(Model):
 
         self.propaganda_factor = propaganda_factor / 1000
         self.exposure_threshold = exposure_threshold
+        self.martyrdom_range = martyrdom_range
 
         # initiate data collectors for agent state feedback
         model_reporters = {

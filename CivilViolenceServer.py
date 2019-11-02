@@ -140,7 +140,9 @@ model_params = {
         description="Importance of propaganda effect in agent Grievance"),
     "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 10, 0, 1000,
         description="Threshold that propaganda agent's influence must exceed to become epxosed to cops"),
-    "movement": UserSettableParameter("checkbox", "Movement", True)
+    "movement": UserSettableParameter("checkbox", "Movement", True),
+    "martyrdom_range": UserSettableParameter("slider", "Martyrdom effect range", 8, 0, 100,
+        description="How close an agent needs to be to a propaganda agent to be influenced by its arrest")
 }
 
 agents_state_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},

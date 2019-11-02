@@ -3,6 +3,7 @@ import random
 
 from mesa import Agent
 from settings import PROPAGANDA_AGENT_CLASS,POPULATION_AGENT_CLASS,COP_AGENT_CLASS
+import math
 
 FACTOR = 1
 
@@ -110,7 +111,7 @@ class PopulationAgent(Agent):
         # position of neighborhood cells
         self.neighborhood = self.model.grid.get_neighborhood(
             self.pos, moore=False, radius=self.vision)
-        # attributes of all the neighboars
+        # attributes of all the neighbors
         self.neighbors = self.model.grid.get_cell_list_contents(
             self.neighborhood)
         # empty neighborhood cells
@@ -188,6 +189,20 @@ class PopulationAgent(Agent):
         self.grievance += self.propaganda_factor * self.cal_propaganda_effect() / (1 + self.propaganda_factor)
         return self.grievance
 
+    def update_activeness(self):
+        self.net_risk = self.risk_aversion * self.arrest_probability
+        thresh_bool = (self.grievance - self.net_risk) > self.threshold
+
+        # simple state transition rule A for population agent
+        # Case 1: if state is inactive and thresh bool is true
+        # then transition to an active state, set active flag to true
+        # Case 2: if active flag is true but thresh bool has changed to false
+        # then transition back to inactive state
+        if not self.active and thresh_bool:
+            self.active = True
+        elif self.active and not thresh_bool:
+            self.active = False
+
 
 class CopAgent(Agent):
     """
@@ -260,9 +275,32 @@ class CopAgent(Agent):
         jailed.jail_time = self.random.randint(1, self.model.max_jail_term)
         # reduce the influence of the propaganda agent for when they become free
         if jailed.agent_class in [PROPAGANDA_AGENT_CLASS]:
-            #print('jailed propaganda agent,')
+            print('jailed propaganda agent,')
             jailed.total_influence /= jailed.jail_time * FACTOR
-            #print('with new total influence after release:{:.4f}'.format(jailed.total_influence)) 
+            #print('with new total influence after release:{:.4f}'.format(jailed.total_influence))
+
+            # influence the hardship of population agents that are affected by the propaganda agent
+            prop_neighbors = []
+            for agent in jailed.neighbors:
+                if agent.agent_class in [POPULATION_AGENT_CLASS]:
+                    # distance between agents resembles the level of affection between agents
+                    distance = math.sqrt((jailed.pos[0] - agent.pos[0])**2 + (jailed.pos[1] - agent.pos[1])**2)
+                    prop_neighbors.append({'unique_id': agent.unique_id, 'distance': distance})
+            # get only the agents that are within the specified range
+            prop_neighbors.sort(key=lambda ag: ag['distance'])
+            prop_neighbors = prop_neighbors[:self.model.martyrdom_range]
+
+            for neighbor in prop_neighbors:
+                agent = next((agent for agent in self.model.schedule.agents if agent.unique_id == neighbor['unique_id']), None)
+                agent.active = True
+                # agent.update_activeness()
+                print("made agent {} active".format(agent.unique_id))
+
+
+            # affect hardship of neighbours in some way
+
+            # update grievance of neighbours
+            
             
         if self.model.movement:
             self.model.grid.move_agent(self, jailed.pos)
@@ -299,7 +337,7 @@ class PropagandaAgent(Agent):
         # position of neighborhood cells
         self.neighborhood = self.model.grid.get_neighborhood(
             self.pos, moore=False, radius=self.vision)
-        # attributes of all the neighboars
+        # attributes of all the neighbors
         self.neighbors = self.model.grid.get_cell_list_contents(
             self.neighborhood)
         # empty neighborhood cells
