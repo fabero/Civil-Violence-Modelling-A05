@@ -277,7 +277,6 @@ class CopAgent(Agent):
         if jailed.agent_class in [PROPAGANDA_AGENT_CLASS]:
             print('jailed propaganda agent,')
             jailed.total_influence /= jailed.jail_time * FACTOR
-            #print('with new total influence after release:{:.4f}'.format(jailed.total_influence))
 
             # influence the activeness of population agents that are affected by the propaganda agent
             prop_neighbors = []
