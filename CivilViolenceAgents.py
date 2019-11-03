@@ -279,7 +279,7 @@ class CopAgent(Agent):
             jailed.total_influence /= jailed.jail_time * FACTOR
             #print('with new total influence after release:{:.4f}'.format(jailed.total_influence))
 
-            # influence the hardship of population agents that are affected by the propaganda agent
+            # influence the activeness of population agents that are affected by the propaganda agent
             prop_neighbors = []
             for agent in jailed.neighbors:
                 if agent.agent_class in [POPULATION_AGENT_CLASS]:
@@ -290,16 +290,11 @@ class CopAgent(Agent):
             prop_neighbors.sort(key=lambda ag: ag['distance'])
             prop_neighbors = prop_neighbors[:self.model.martyrdom_range]
 
+            # make agents that are affected by the jailed propaganda agent active
             for neighbor in prop_neighbors:
                 agent = next((agent for agent in self.model.schedule.agents if agent.unique_id == neighbor['unique_id']), None)
                 agent.active = True
-                # agent.update_activeness()
                 print("made agent {} active".format(agent.unique_id))
-
-
-            # affect hardship of neighbours in some way
-
-            # update grievance of neighbours
             
             
         if self.model.movement:
