@@ -54,7 +54,7 @@ class CivilViolenceModel(Model):
             max_iters=1000,
             propaganda_agent_density=2,
             propaganda_factor=1,
-            propaganda_exposure_threshold=100,
+            propaganda_exposure_threshold=30,
     ):
         super().__init__()
         self.height = height

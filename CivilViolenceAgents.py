@@ -135,8 +135,7 @@ class PopulationAgent(Agent):
 
         # threshold for propaganda count exposure above which agents develops a
         # feeling of nationalism
-        print('resultant netrisk:', net_risk/4.0)
-        return net_risk/4.0
+        return(net_risk - 0.1)
 
     def step(self):
         # The population agent's movement and activenes rules A and M from the
@@ -190,8 +189,12 @@ class PopulationAgent(Agent):
         self.grievance = self.grievance
         self.net_risk = self.risk_aversion * self.arrest_probability
 
-        if self.propaganda_exposure_count == self.propaganda_exposure_threshold:
+        if self.propaganda_exposure_count >= self.propaganda_exposure_threshold:
+            # reduce the netrisk by a constant factor of 0.1
             self.net_risk = self.induced_nationalism_strategy(self.net_risk)
+            # initialize propaganda exposure count to 0
+            # this way all the agents will repeatedly observe a reduced netrisk
+            # after 100 counts of propaganda exposure
             self.propaganda_exposure_count = 0
             print('influenced by nationalism, ready to rebel more!', self.net_risk)
 
