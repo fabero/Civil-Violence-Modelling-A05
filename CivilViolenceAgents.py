@@ -135,7 +135,7 @@ class PopulationAgent(Agent):
 
         # threshold for propaganda count exposure above which agents develops a
         # feeling of nationalism
-        return(net_risk - 0.1)
+        return(net_risk - self.susceptibility * self.propaganda_factor)
 
     def step(self):
         # The population agent's movement and activenes rules A and M from the
