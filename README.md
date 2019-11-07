@@ -101,8 +101,8 @@ jailing (the sentence is bigger).
 
 # Propaganda Strategies
 In current version, my 3 implemented propaganda strategies can be loaded interactively from the server through the corresponding global parameter. It is:
-0 -> Transfer
-1 -> Bandwagon
-2 -> Demonizing the Enemy
+- 0 -> Transfer
+- 1 -> Bandwagon
+- 2 -> Demonizing the Enemy
 
 Be sure to reset before hitting Go
