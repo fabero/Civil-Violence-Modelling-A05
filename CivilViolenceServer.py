@@ -16,13 +16,13 @@ start_prop = "#FFEBE3"
 end_prop = "#FF4500"
 
 # start and end hex values for grievance of a population agent 
-start_griev = "#6658CF" 
-end_griev =  "#66FFB2"
+start_griev = "#A8FFD3" 
+end_griev =  "#00FF7F"
 
 # we generate an array of hex values in between stsart and end hex values
 # in order to represent the grievance of the agents with an array of 
 # values in the grid 
-grad_grievance = linear_gradient(start_griev, end_griev, n=500)['hex']
+grad_grievance = linear_gradient(start_griev, end_griev, n=40 )['hex']
 
 # we generate an array of hex values in between start and end hex values
 # in order to represent agents with an array of propaganda values
@@ -58,8 +58,7 @@ def grievance_portrayal(agent):
         Visualize the Grievance of the agents 
         '''
         grievance_value = int(agent.grievance * 100)
-        color = grad_grievance[grievance_value]
-        portrayal['Color'] = color 
+        portrayal['Color'] = grad_grievance[grievance_value]
         portrayal['w'] = .75
         portrayal['h'] = .75
         portrayal['Layer'] = 1
@@ -140,7 +139,9 @@ model_params = {
         description="Importance of propaganda effect in agent Grievance"),
     "exposure_threshold": UserSettableParameter("slider", "Propaganda Agent Exposure Threshold", 10, 0, 1000,
         description="Threshold that propaganda agent's influence must exceed to become epxosed to cops"),
-    "movement": UserSettableParameter("checkbox", "Movement", True)
+    "movement": UserSettableParameter("checkbox", "Movement", True),
+    "propaganda_strategy": UserSettableParameter("slider", "Propaganda Strategy", 0, 0, 2,
+        description="The strategy followed by propaganda agents")
 }
 
 agents_state_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
@@ -148,10 +149,9 @@ agents_state_chart = ChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_CO
                           {"Label": "Jailed", "Color": JAIL_COLOR},
                           {"Label": "Active Propaganda Agents", "Color": end_prop}], 100, 270)
 
-
 grievance_chart = ChartModule([{"Label": "Total Inactive Grievance", "Color": AGENT_QUIET_COLOR},
-                               {"Label": "Total Inactive Net Risk", "Color": COP_COLOR},
-                               {"Label": "Total Influence", "Color": end_prop}], 50, 135)
+                               {"Label": "Total Inactive Net Risk", "Color": COP_COLOR}], 50, 135)
+                               #{"Label": "Total Influence", "Color": end_prop}], 50, 135)
 
 pie_chart = PieChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
                             {"Label": "Active", "Color": AGENT_REBEL_COLOR},
@@ -161,7 +161,6 @@ pie_chart = PieChartModule([{"Label": "Quiescent", "Color": AGENT_QUIET_COLOR},
 ripeness_chart = ChartModule([{"Label": "Ripeness Index", "Color": end_griev}], 200, 500)
 
 canvas_element = CanvasGrid(citizen_cop_portrayal, 40, 40, 500, 500)
-
 grievance_element = CanvasGrid(grievance_portrayal, 40, 40, 500, 500)
 
 server = ModularServer(CivilViolenceModel, [canvas_element, grievance_element, pie_chart, ripeness_chart, grievance_chart, agents_state_chart],
