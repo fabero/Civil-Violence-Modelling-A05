@@ -98,3 +98,11 @@ this choice is that the central authority has exposed the certain propaganda
 agent (because her influence exceeded the desired threshold) and has prioritized
 grabbing them. Maybe also the jailing factor should be greater for this type of
 jailing (the sentence is bigger).
+
+# Propaganda Strategies
+In current version, my 3 implemented propaganda strategies can be loaded interactively from the server through the corresponding global parameter. It is:
+0 -> Transfer
+1 -> Bandwagon
+2 -> Demonizing the Enemy
+
+Be sure to reset before hitting Go
