@@ -6,7 +6,7 @@ from mesa.datacollection import DataCollector
 
 from CivilViolenceAgents import PopulationAgent, CopAgent,PropagandaAgent
 
-from settings import POPULATION_AGENT_CLASS,PROPAGANDA_AGENT_CLASS,COP_AGENT_CLASS
+from settings import *
 
 
 class CivilViolenceModel(Model):
@@ -58,6 +58,7 @@ class CivilViolenceModel(Model):
             propaganda_agent_density=2,
             propaganda_factor=1,
             exposure_threshold=10,
+            propaganda_strategy=TRANSFER_STRATEGY
     ):
         super().__init__()
         self.height = height
@@ -81,6 +82,7 @@ class CivilViolenceModel(Model):
 
         self.propaganda_factor = propaganda_factor / 1000
         self.exposure_threshold = exposure_threshold
+        self.propaganda_strategy = propaganda_strategy
 
         # initiate data collectors for agent state feedback
         model_reporters = {
@@ -90,8 +92,7 @@ class CivilViolenceModel(Model):
             "Active Propaganda Agents": lambda m: self.count_propaganda_agents(m),
             "Total Inactive Grievance": lambda m : self.report_total_inactive_grievance(m), 
             "Total Inactive Net Risk":  lambda m : self.report_total_inactive_net_risk(m),  
-
-            "Total Influence": lambda m : self.report_total_influence(m),
+            #"Total Influence": lambda m : self.report_total_influence(m),
             "Ripeness Index": lambda m: self.report_ripeness_index(m)}
 
         agent_reporters = {
@@ -115,6 +116,7 @@ class CivilViolenceModel(Model):
         for (contents, x, y) in self.grid.coord_iter():
             if self.random.random() < self.propaganda_agent_density:
                 agent = PropagandaAgent(unique_id, self,
+                                          strategy = self.propaganda_strategy,
                                           influence = self.random.random(),
                                           exposure_threshold = self.exposure_threshold,
                                           vision=self.citizen_vision,
