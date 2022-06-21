@@ -20,7 +20,7 @@ jupyter-core==4.5.0
 MarkupSafe==1.1.1
 Mesa==0.8.6
 networkx==2.3
-numpy==1.17.2
+numpy==1.22.0
 pandas==0.25.1
 parso==0.5.1
 pexpect==4.7.0
